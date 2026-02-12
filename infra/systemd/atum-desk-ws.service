@@ -1,0 +1,21 @@
+[Unit]
+Description=ATUM DESK WebSocket Service
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=exec
+User=navi
+Group=navi
+WorkingDirectory=/data/ATUM DESK/atum-desk/api
+Environment=PATH=/data/ATUM DESK/atum-desk/api/.venv/bin
+Environment=PYTHONPATH=/data/ATUM DESK/atum-desk/api
+Environment=ENVIRONMENT=production
+ExecStart=/data/ATUM DESK/atum-desk/api/.venv/bin/python -m app.websocket.server
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,175 @@
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { Wordmark } from '../components/Brand/Wordmark'
+import AtumSilhouette from '../assets/atum/atum-silhouette.svg'
+
+export default function LandingPage() {
+    return (
+        <div className="relative min-h-screen w-full overflow-x-hidden bg-[var(--bg-0)] text-[var(--text-0)] selection:bg-[var(--glow-gold)] selection:text-black">
+
+            {/* Background Ambience */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-[-30%] right-[-10%] w-[90vw] h-[90vw] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.12)_0%,transparent_70%)] opacity-50 mix-blend-screen animate-pulse-slow"></div>
+                <div className="absolute top-0 right-0 h-[80vh] w-auto opacity-40 mix-blend-overlay transform scale-x-[-1]">
+                    <img src={AtumSilhouette} alt="" className="h-full w-auto object-contain drop-shadow-[0_0_50px_rgba(0,0,0,0.8)]" />
+                </div>
+                <div className="grain-overlay"></div>
+            </div>
+
+            {/* Navigation */}
+            <nav className="relative z-50 flex items-center justify-between px-6 py-6 lg:px-12 backdrop-blur-sm border-b border-[rgba(255,255,255,0.02)]">
+                <div className="flex items-center gap-4">
+                    <Link to="/" className="group">
+                        <Wordmark className="h-8 text-[var(--text-0)]" suffix="DESK" />
+                    </Link>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Link
+                        to="/portal/login"
+                        className="text-xs font-bold tracking-widest uppercase hover:text-[var(--accent-gold)] transition-colors border border-[rgba(255,255,255,0.1)] px-4 py-2 rounded-full hover:bg-[rgba(255,255,255,0.05)]"
+                    >
+                        Customer Portal
+                    </Link>
+                    <Link
+                        to="/desk/login"
+                        className="group relative overflow-hidden rounded-full bg-[var(--text-0)] px-6 py-2 text-black font-bold tracking-wide transition-all hover:scale-105 text-xs uppercase"
+                    >
+                        <span className="relative z-10 group-hover:text-[var(--bg-0)]">Staff Desk</span>
+                        <div className="absolute inset-0 -translate-x-[102%] group-hover:translate-x-0 bg-[var(--accent-gold)] transition-transform duration-300 ease-out"></div>
+                    </Link>
+                </div>
+            </nav>
+
+            {/* Hero Section */}
+            <main className="relative z-10 px-6 lg:px-12 pt-24 pb-0 animate-rise">
+                <div className="max-w-4xl">
+                    <h1 className="text-5xl lg:text-8xl font-black tracking-tight leading-[0.9] text-white mb-8 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                        Support Excellence. <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-[var(--text-1)]">Reimagined.</span>
+                    </h1>
+                    <p className="text-xl lg:text-2xl text-[var(--text-1)] max-w-2xl font-light mb-12 leading-relaxed">
+                        Enterprise-grade helpdesk and ticketing platform. <br />
+                        <span className="text-[var(--accent-gold)] font-medium">AI-powered triage. Real-time updates. Multi-tenant.</span>
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-6">
+                        <Link
+                            to="/desk/login"
+                            className="group relative overflow-hidden rounded-full bg-[var(--text-0)] px-10 py-5 text-black font-bold tracking-wide transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] text-center"
+                        >
+                            <span className="relative z-10 group-hover:text-[var(--bg-0)]">OPEN DESK</span>
+                            <div className="absolute inset-0 -translate-x-[102%] group-hover:translate-x-0 bg-[var(--accent-gold)] transition-transform duration-300 ease-out"></div>
+                        </Link>
+
+                        <Link
+                            to="/portal/login"
+                            className="px-8 py-5 rounded-full border border-[var(--glass-border)] hover:bg-[rgba(255,255,255,0.05)] transition-all uppercase text-xs font-bold tracking-widest text-[var(--text-1)] hover:text-white hover:border-[var(--accent-gold)] text-center flex items-center justify-center"
+                        >
+                            Customer Portal
+                        </Link>
+                    </div>
+                </div>
+            </main>
+
+            {/* Elite Access Menu */}
+            <section className="relative z-10 mt-32 px-6 lg:px-12 pb-16">
+                <div className="max-w-5xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-2">Access Points</h2>
+                        <div className="w-12 h-0.5 bg-[var(--accent-gold)] opacity-60"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Staff Desk Card */}
+                        <Link to="/desk/login" className="nav-card group">
+                            <div className="nav-card-icon" style={{ background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.25)' }}>
+                                🛡️
+                            </div>
+                            <div className="nav-card-title">Staff Desk</div>
+                            <div className="nav-card-desc">
+                                Agent workspace for managing support tickets. Inbox, dashboard, assignment, SLA tracking, and AI-assisted responses.
+                            </div>
+                            <div className="nav-card-arrow">→</div>
+                        </Link>
+
+                        {/* Customer Portal Card */}
+                        <Link to="/portal/login" className="nav-card group">
+                            <div className="nav-card-icon" style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)' }}>
+                                🎫
+                            </div>
+                            <div className="nav-card-title">Customer Portal</div>
+                            <div className="nav-card-desc">
+                                Self-service portal for customers. Submit tickets, track status, browse knowledge base, and communicate with support.
+                            </div>
+                            <div className="nav-card-arrow">→</div>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Feature Strip */}
+            <section className="relative z-10 border-y border-[var(--glass-border)] bg-[rgba(5,5,5,0.5)] backdrop-blur-md overflow-hidden">
+                <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        {[
+                            { icon: '⚡', title: 'AI Triage', desc: 'Auto-classify and route tickets with intelligent AI analysis' },
+                            { icon: '📡', title: 'Real-Time', desc: 'Live ticket updates and notifications via WebSocket' },
+                            { icon: '🏢', title: 'Multi-Tenant', desc: 'Full organization isolation with role-based access control' },
+                            { icon: '🔒', title: 'Enterprise Security', desc: 'JWT auth, RBAC, audit logging, and data encryption' },
+                        ].map((feat, i) => (
+                            <div key={i} className="group text-center md:text-left">
+                                <div className="text-2xl mb-4">{feat.icon}</div>
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-2 group-hover:text-[var(--accent-gold)] transition-colors">{feat.title}</h3>
+                                <p className="text-xs text-[var(--text-2)] leading-relaxed">{feat.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Feature Bento Grid */}
+            <section className="relative z-10 px-6 lg:px-12 py-32">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                    <div className="glass-panel col-span-1 md:col-span-2 p-10 rounded-2xl min-h-[300px] flex flex-col justify-end relative overflow-hidden group border border-[var(--glass-border)]">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-10"></div>
+                        <div className="relative z-20">
+                            <h3 className="text-3xl font-bold mb-4 group-hover:text-[var(--accent-gold)] transition-colors">Intelligent Ticketing</h3>
+                            <p className="text-[var(--text-1)] max-w-md">
+                                Unified inbox with AI-powered categorization, smart assignment, SLA monitoring, and automated workflows for your entire support operation.
+                            </p>
+                        </div>
+                        <div className="absolute top-0 right-0 w-full h-full opacity-10 group-hover:opacity-20 transition-opacity">
+                            <svg className="w-full h-full" viewBox="0 0 400 300">
+                                <path d="M0 0 L400 300" stroke="white" strokeWidth="0.5" />
+                                <path d="M400 0 L0 300" stroke="white" strokeWidth="0.5" />
+                                <circle cx="200" cy="150" r="100" stroke="white" strokeWidth="0.5" fill="none" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div className="glass-panel p-10 rounded-2xl min-h-[300px] flex flex-col justify-end group border border-[var(--glass-border)]">
+                        <div className="text-4xl mb-auto text-[var(--text-2)] group-hover:text-[var(--accent-gold)] transition-colors">📊</div>
+                        <h3 className="text-3xl font-bold mb-4">Analytics</h3>
+                        <p className="text-[var(--text-1)]">Real-time metrics, response time tracking, agent performance, and SLA compliance reporting.</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="relative z-10 border-t border-[var(--glass-border)] py-12 px-6 lg:px-12 bg-black/60 backdrop-blur-xl">
+                <div className="flex flex-col md:flex-row justify-between items-center opacity-60 text-[10px] uppercase tracking-widest text-[var(--text-1)]">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[var(--accent-gold)]"></div>
+                        <span>© 2026 ATUM DESK | v1.0.0</span>
+                    </div>
+                    <div className="flex gap-8 mt-4 md:mt-0">
+                        <Link to="/desk/login" className="hover:text-white transition-colors">Staff Desk</Link>
+                        <Link to="/portal/login" className="hover:text-white transition-colors">Portal</Link>
+                        <a href="#" className="hover:text-white transition-colors">Docs</a>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    )
+}

@@ -1,0 +1,26 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Solar Disk Halo -->
+  <circle cx="200" cy="180" r="140" fill="url(#sun-gradient)" opacity="0.1" />
+  
+  <!-- Geometric Atum Profile -->
+  <path d="M200 80 L240 120 L240 260 L200 300 L160 260 L160 120 Z" fill="#0A0A0A" opacity="0.8" />
+  <path d="M200 80 L200 300" stroke="url(#gold-line)" stroke-width="2" />
+  <path d="M160 120 L240 120" stroke="url(#gold-line)" stroke-width="1" opacity="0.5" />
+  <path d="M160 260 L240 260" stroke="url(#gold-line)" stroke-width="1" opacity="0.5" />
+  
+  <!-- Sacred Geometry Hints -->
+  <circle cx="200" cy="120" r="4" fill="#D4AF37" opacity="0.6" />
+  <circle cx="200" cy="260" r="4" fill="#D4AF37" opacity="0.6" />
+  
+  <defs>
+    <radialGradient id="sun-gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 180) rotate(90) scale(140)">
+      <stop stop-color="#D4AF37" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#D4AF37" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold-line" x1="200" y1="80" x2="200" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D4AF37" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#D4AF37" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#D4AF37" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

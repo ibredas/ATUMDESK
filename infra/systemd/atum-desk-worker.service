@@ -1,0 +1,21 @@
+[Unit]
+Description=ATUM DESK Celery Worker
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=exec
+User=navi
+Group=navi
+WorkingDirectory=/data/ATUM DESK/atum-desk/api
+Environment=PATH=/data/ATUM DESK/atum-desk/api/.venv/bin
+Environment=PYTHONPATH=/data/ATUM DESK/atum-desk/api
+Environment=ENVIRONMENT=production
+ExecStart=/data/ATUM DESK/atum-desk/api/.venv/bin/celery -A app.celery.tasks worker --loglevel=info --concurrency=2
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
