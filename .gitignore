@@ -1,35 +1,284 @@
-# Python
+# ATUM DESK - Git Ignore File
+# Comprehensive ignore patterns for security and cleanliness
+
+# =============================================================================
+# DATABASE FILES (CRITICAL - NEVER COMMIT)
+# =============================================================================
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+*.backup
+data/
+backups/
+dumps/
+pgdata/
+postgres_data/
+redis_data/
+
+# =============================================================================
+# ENVIRONMENT & SECRETS (CRITICAL - NEVER COMMIT)
+# =============================================================================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+config.local.js
+config.local.json
+
+# =============================================================================
+# PYTHON (Backend)
+# =============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
-.venv/
-venv/
-*.env
-.env.*
-!.env.example
-
-# Node
-node_modules/
+*.so
+.Python
+build/
+develop-eggs/
 dist/
-.DS_Store
-
-# Logs
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
 *.log
+*.pot
+
+# =============================================================================
+# NODE / JAVASCRIPT (Frontend)
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+dist-ssr/
+*.local
+.vite/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# =============================================================================
+# UPLOADS & USER DATA
+# =============================================================================
+uploads/
+attachments/
+files/
+media/
+storage/
+public/uploads/
+static/uploads/
+
+# =============================================================================
+# LOGS & TEMPORARY FILES
+# =============================================================================
 logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+*.tar.gz
+*.zip
+*.rar
+*.7z
+tmp/
+temp/
+tmp.*
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Data & DB
-internal.db
-*.db
-*.sqlite
-data/uploads/
-api/data/uploads/
-
-# IDE
+# =============================================================================
+# IDE & EDITOR FILES
+# =============================================================================
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.atom/
+*.code-workspace
 
-# OS
-Thumbs.db
+# =============================================================================
+# OS SPECIFIC
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# Build
+# =============================================================================
+# TESTING & COVERAGE
+# =============================================================================
+coverage/
+.nyc_output/
+*.cover
+*.lcov
+*.coverage
+htmlcov/
+.tox/
+.cache
+
+# =============================================================================
+# DEPLOYMENT & BUILD ARTIFACTS
+# =============================================================================
+*.war
+*.ear
+*.zip
+dist/
 build/
+out/
+release/
+deploy/
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# =============================================================================
+# AI & MODEL FILES (LARGE - NEVER COMMIT)
+# =============================================================================
+*.gguf
+*.bin
+*.onnx
+*.pt
+*.pth
+*.h5
+*.pb
+*.tflite
+*.mlmodel
+models/
+checkpoints/
+embeddings/
+vector_store/
+chroma/
+
+# =============================================================================
+# DOCUMENTATION BUILD
+# =============================================================================
+site/
+docs/_build/
+docs/build/
+*.html.pdf
+
+# =============================================================================
+# CERTIFICATES & KEYS
+# =============================================================================
+*.pem
+*.key
+*.crt
+*.csr
+*.der
+*.p12
+*.pfx
+.ssl/
+certs/
+
+# =============================================================================
+# LOCAL DEVELOPMENT OVERRIDES
+# =============================================================================
+docker-compose.override.yml
+.docker/
+kubernetes/secrets/
+helm/charts/
+
+# =============================================================================
+# MONITORING & PROFILING
+# =============================================================================
+*.prof
+*.profile
+profile/
+profiler/
+heapdump*
+core.*
+
+# =============================================================================
+# ATUM DESK SPECIFIC
+# =============================================================================
+atum-desk/api/.env
+atum-desk/api/.venv/
+atum-desk/api/uvicorn_restart.log
+atum-desk/api/uvicorn_reload.log
+atum-desk/data/uploads/
+atum-desk/api/data/uploads/
+atum-desk/web/node_modules/
+atum-desk/web/dist/
+
+# =============================================================================
+# MISC
+# =============================================================================
+.history/
+*.orig
+*.rej
+*sublime*
+*.iml
+.agent/
+.venv/
+node_modules/
+dist/
+dist-ssr/
+.DS_Store
+Thumbs.db
+desktop.ini
+

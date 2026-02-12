@@ -1,0 +1,17 @@
+[Unit]
+Description=ATUM DESK API Service
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=navi
+Group=navi
+ExecStart=/data/ATUM DESK/atum-desk/infra/scripts/start-api.sh
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
