@@ -17,10 +17,19 @@ def get_vector_store() -> PGVector:
     # Note: langchain-postgres might require 'psycopg' (v3) driver in the URL.
     connection_url = str(settings.DATABASE_URL)
     
-    return PGVector(
-        embeddings=embeddings,
-        collection_name="tickets_vector_store",
-        connection=connection_url,
-        use_jsonb=True,
-        create_extension=False,
-    )
+    # Monkeypatch PGVector to avoid MissingGreenlet error
+    # langchain-postgres attempts to sync-create tables in __post_init__
+    original_init = PGVector.create_tables_if_not_exists
+    PGVector.create_tables_if_not_exists = lambda self: None
+    
+    try:
+        return PGVector(
+            embeddings=embeddings,
+            collection_name="tickets_vector_store",
+            connection=connection_url,
+            use_jsonb=True,
+            create_extension=False,
+        )
+    finally:
+        PGVector.create_tables_if_not_exists = original_init
+

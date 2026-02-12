@@ -13,7 +13,7 @@ import asyncio
 
 from app.config import get_settings
 from app.db.init_db import init_db
-from app.routers import auth, users, tickets, internal_tickets, comments, attachments
+from app.routers import auth, users, tickets, internal_tickets, comments, attachments, health
 
 settings = get_settings()
 logger = structlog.get_logger()
@@ -110,6 +110,7 @@ app.include_router(tickets.router, prefix="/api/v1/tickets", tags=["Tickets"])
 app.include_router(internal_tickets.router, prefix="/api/v1/internal/tickets", tags=["Internal Tickets"])
 app.include_router(comments.router, prefix="/api/v1/comments", tags=["Comments"])
 app.include_router(attachments.router, prefix="/api/v1/attachments", tags=["Attachments"])
+app.include_router(health.router, prefix="/api/v1/health", tags=["System Health"])
 
 from app.routers import webhooks
 app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["Webhooks"])

@@ -73,13 +73,15 @@ async def upload_attachment(
     if file_ext not in settings.ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="File type not allowed")
     
-    # Generate safe filename
+    # Generate safe path with date-based sub-directory for randomization
+    now = datetime.utcnow()
+    date_path = now.strftime("%Y/%m/%d")
+    full_upload_dir = os.path.join(settings.UPLOAD_DIR, date_path)
+    os.makedirs(full_upload_dir, exist_ok=True)
+
     file_id = uuid.uuid4()
     safe_filename = f"{file_id}.{file_ext}"
-    file_path = os.path.join(settings.UPLOAD_DIR, safe_filename)
-    
-    # Ensure upload directory exists
-    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    file_path = os.path.join(full_upload_dir, safe_filename)
     
     # Calculate hash
     file_hash = hashlib.sha256(contents).hexdigest()
@@ -102,6 +104,20 @@ async def upload_attachment(
     
     db.add(attachment)
     await db.flush()
+
+    # Audit Log
+    from app.models.audit_log import AuditLog
+    new_audit = AuditLog(
+        organization_id=current_user.organization_id,
+        user_id=current_user.id,
+        action="ATTACHMENT_UPLOAD",
+        entity_type="ATTACHMENT",
+        entity_id=attachment.id,
+        new_values={"filename": file.filename, "file_size": attachment.file_size}
+    )
+    db.add(new_audit)
+    await db.commit()
+    await db.refresh(attachment)
     
     return AttachmentResponse(
         id=str(attachment.id),
@@ -149,6 +165,19 @@ async def download_attachment(
     # Update access tracking
     attachment.access_count += 1
     attachment.last_accessed_at = datetime.utcnow()
+
+    # Audit Log
+    from app.models.audit_log import AuditLog
+    new_audit = AuditLog(
+        organization_id=current_user.organization_id,
+        user_id=current_user.id,
+        action="ATTACHMENT_DOWNLOAD",
+        entity_type="ATTACHMENT",
+        entity_id=attachment.id,
+        new_values={"filename": attachment.original_filename}
+    )
+    db.add(new_audit)
+    await db.commit()
     
     if not os.path.exists(attachment.file_path):
         raise HTTPException(status_code=404, detail="File not found on disk")
