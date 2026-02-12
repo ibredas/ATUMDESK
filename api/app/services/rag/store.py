@@ -22,4 +22,5 @@ def get_vector_store() -> PGVector:
         collection_name="tickets_vector_store",
         connection=connection_url,
         use_jsonb=True,
+        create_extension=False,
     )

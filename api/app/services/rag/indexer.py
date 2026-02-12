@@ -29,15 +29,12 @@ async def index_ticket(ticket: Ticket):
     # We need to fetch resolution notes or comments.
     # For now, we just index the problem.
     
-    # Add to store
-    # PGVector.add_documents is sync or async?
-    # langchain_postgres.PGVector usually supports async via aadd_documents
-    await store.aadd_documents(docs)
-    
-    # Update ticket with embedding? 
-    # langchain stores embedding in its own table (langchain_pg_embedding).
-    # We do NOT need to manually update ticket.embedding_vector if using langchain-postgres.
-    # The `embedding_vector` column I added to Ticket might be redundant if we use standard PGVector table.
-    # BUT, hybrid user wants it on the Ticket?
-    # Actually, using centralized table is better for RAG.
-    # I'll stick to langchain's table.
+    try:
+        # Add to store
+        # langchain_postgres.PGVector supports async via aadd_documents
+        await store.aadd_documents(docs)
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Failed to index ticket {ticket.id}: {e}")
+        # Build resilience: Don't crash the server for background task failure

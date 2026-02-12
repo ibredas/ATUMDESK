@@ -8,7 +8,8 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 
 from app.db.session import get_session
-from app.auth.jwt import get_current_user, get_password_hash
+from app.auth.jwt import get_password_hash
+from app.auth.deps import get_current_user
 from app.models.user import User, UserRole
 
 router = APIRouter()
@@ -84,7 +85,8 @@ async def create_user(
     )
     
     db.add(new_user)
-    await db.flush()
+    await db.commit()
+    await db.refresh(new_user)
     
     return UserResponse(
         id=str(new_user.id),

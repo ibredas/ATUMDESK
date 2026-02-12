@@ -14,7 +14,7 @@ from sqlalchemy import select
 
 from app.db.session import get_session
 from app.config import get_settings
-from app.auth.jwt import get_current_user
+from app.auth.deps import get_current_user
 from app.models.user import User, UserRole
 from app.models.ticket import Ticket
 from app.models.attachment import Attachment

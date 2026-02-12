@@ -3,15 +3,18 @@ ATUM DESK - Tickets Router (Customer Portal)
 """
 from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 from sqlalchemy import select, desc
 
 from app.db.session import get_session
-from app.auth.jwt import get_current_user
+from app.auth.deps import get_current_user
 from app.models.user import User, UserRole
 from app.models.ticket import Ticket, TicketStatus, TicketPriority
+from app.services.webhook_service import webhook_service
+from app.services.email_notification import email_notification_service
+# Removed SlackService per No-External-API policy
 
 router = APIRouter()
 
@@ -62,12 +65,6 @@ async def list_my_tickets(
     ]
 
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from app.services.webhook_service import webhook_service
-from app.services.email_notification import email_notification_service
-
-# ... (imports)
-
 @router.post("", response_model=TicketResponse, status_code=status.HTTP_201_CREATED)
 async def create_ticket(
     ticket_data: TicketCreate,
@@ -76,9 +73,17 @@ async def create_ticket(
     db: AsyncSession = Depends(get_session)
 ):
     """Create new ticket (customer)"""
-    # ... (validation)
     
-    # ... (creation)
+    # Create ticket
+    new_ticket = Ticket(
+        organization_id=current_user.organization_id,
+        requester_id=current_user.id,
+        subject=ticket_data.subject,
+        description=ticket_data.description,
+        priority=ticket_data.priority, 
+        service_id=None, # Optional
+        status=TicketStatus.NEW
+    )
     
     db.add(new_ticket)
     await db.commit() # Commit expressly so ID is finalized and data persisted for webhook longevity
@@ -117,18 +122,16 @@ async def create_ticket(
         body_html=email_body
     )
     
-    # Send Slack Notification
-    background_tasks.add_task(
-        slack_service.send_notification,
-        message=f"🎫 *New Ticket Created*\n*ID:* {new_ticket.id}\n*Subject:* {new_ticket.subject}\n*By:* {current_user.email}"
-    )
+    # Slack removed
     
     # RAG Indexing
-    from app.services.rag.indexer import index_ticket
-    background_tasks.add_task(index_ticket, new_ticket)
+    try:
+        from app.services.rag.indexer import index_ticket
+        background_tasks.add_task(index_ticket, new_ticket)
+    except ImportError:
+        pass # RAG might strictly require deps
     
     return TicketResponse(
-
         id=str(new_ticket.id),
         subject=new_ticket.subject,
         description=new_ticket.description,

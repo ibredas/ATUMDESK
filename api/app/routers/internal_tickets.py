@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, desc, and_
 
 from app.db.session import get_session
-from app.auth.jwt import get_current_user
+from app.auth.deps import get_current_user
 from app.models.user import User, UserRole
 from app.models.ticket import Ticket, TicketStatus, TicketPriority
 

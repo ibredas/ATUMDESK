@@ -2,7 +2,7 @@ from typing import List, Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.jwt import get_current_user
+from app.auth.deps import get_current_user
 from app.models.user import User, UserRole
 from app.services.rag.retriever import search_similar_tickets
 
