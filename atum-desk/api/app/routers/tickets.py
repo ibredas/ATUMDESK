@@ -14,6 +14,7 @@ from app.models.user import User, UserRole
 from app.models.ticket import Ticket, TicketStatus, TicketPriority
 from app.services.webhook_service import webhook_service
 from app.services.email_notification import email_notification_service
+from app.config import get_settings
 # Removed SlackService per No-External-API policy
 
 router = APIRouter()
@@ -125,11 +126,111 @@ async def create_ticket(
     # Slack removed
     
     # RAG Indexing
+    # RAG Indexing (Controlled via Feature Flag)
+    settings = get_settings()
+    if settings.RAG_INDEX_ON_TICKET_CREATE:
+        try:
+            from app.services.rag.indexer import index_ticket
+            background_tasks.add_task(index_ticket, new_ticket)
+        except ImportError as e:
+            import logging
+            logging.getLogger("tickets_router").warning(f"RAG indexing skipped for ticket {new_ticket.id}: missing dependencies", exc_info=True)
+
+    # Audit Log for ticket creation - MUST be written BEFORE auto logic runs
+    # This captures the TRUE initial creation state
+    from app.models.audit_log import AuditLog
+    initial_audit = AuditLog(
+        organization_id=current_user.organization_id,
+        user_id=current_user.id,
+        action="ticket_created",
+        entity_type="ticket",
+        entity_id=new_ticket.id,
+        new_values={
+            "subject": new_ticket.subject,
+            "description": new_ticket.description[:100] + "..." if len(new_ticket.description) > 100 else new_ticket.description,
+            "priority": new_ticket.priority.value,
+            "status": new_ticket.status.value
+        }
+    )
+    db.add(initial_audit)
+    await db.flush()  # Commit the creation audit immediately
+    
+    # Capture state before auto logic runs
+    pre_auto_priority = new_ticket.priority
+    pre_auto_tags = new_ticket.tags.copy() if new_ticket.tags else {}
+    
+    # --- Phase 1: Core Power Logic ---
     try:
-        from app.services.rag.indexer import index_ticket
-        background_tasks.add_task(index_ticket, new_ticket)
-    except ImportError:
-        pass # RAG might strictly require deps
+        # 1. Evaluate Rules (Synchronous to ensure immediate effect)
+        from app.services.rules_service import RulesService
+        rules_service = RulesService(db)
+        # Re-fetch ticket to ensure it's attached if needed, though expire_on_commit=False helps
+        # We pass "ticket_create" event
+        await rules_service.evaluate_ticket(new_ticket, "ticket_create")
+        
+        # 2. Calculate SLA Targets (only runs if status is ACCEPTED - per SLA spec)
+        from app.services.sla_service import SLAService
+        sla_service = SLAService(db)
+        await sla_service.calculate_targets(new_ticket)
+        
+        # Commit any changes made by Rules/SLA
+        await db.commit()
+        await db.refresh(new_ticket)
+        
+        # Check if auto logic changed any fields - write audit if so
+        priority_changed = pre_auto_priority != new_ticket.priority
+        tags_changed = pre_auto_tags != (new_ticket.tags or {})
+        
+        if priority_changed or tags_changed:
+            auto_update_audit = AuditLog(
+                organization_id=current_user.organization_id,
+                user_id=current_user.id,
+                action="ticket_auto_updated",
+                entity_type="ticket",
+                entity_id=new_ticket.id,
+                old_values={
+                    "priority": pre_auto_priority.value if hasattr(pre_auto_priority, 'value') else str(pre_auto_priority),
+                    "tags": pre_auto_tags
+                },
+                new_values={
+                    "priority": new_ticket.priority.value if hasattr(new_ticket.priority, 'value') else str(new_ticket.priority),
+                    "tags": new_ticket.tags or {}
+                }
+            )
+            db.add(auto_update_audit)
+            await db.commit()
+        
+    except Exception as e:
+        # Log error but don't fail the request
+        import logging
+        logging.getLogger("tickets_router").error(f"Failed to run Rules/SLA for ticket {new_ticket.id}: {e}")
+    # ---------------------------------
+
+    # Note: ticket_created audit was already written above (before auto logic)
+        await db.refresh(new_ticket)
+        
+    except Exception as e:
+        # Log error but don't fail the request
+        import logging
+        logging.getLogger("tickets_router").error(f"Failed to run Rules/SLA for ticket {new_ticket.id}: {e}")
+    # ---------------------------------
+    
+    # Audit Log for ticket creation
+    from app.models.audit_log import AuditLog
+    audit = AuditLog(
+        organization_id=current_user.organization_id,
+        user_id=current_user.id,
+        action="ticket_created",
+        entity_type="ticket",
+        entity_id=new_ticket.id,
+        new_values={
+            "subject": new_ticket.subject,
+            "priority": new_ticket.priority.value,
+            "status": new_ticket.status.value
+        }
+    )
+    db.add(audit)
+    await db.commit()
     
     return TicketResponse(
         id=str(new_ticket.id),
