@@ -84,6 +84,9 @@ class Settings(BaseSettings):
     OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text:latest"
     OLLAMA_TIMEOUT: int = 30
     AI_ENABLED: bool = True
+    # RAG Indexing: Disabled by default for stability. Enable via env var for Phase 3.
+    # When enabled, tickets are indexed for semantic search via background task.
+    RAG_INDEX_ON_TICKET_CREATE: bool = Field(default=False)
     
     # Rate Limiting
     RATE_LIMIT_LOGIN: int = 5  # attempts per 15 minutes

@@ -57,6 +57,21 @@ app.add_middleware(
 )
 
 
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    """Add security headers to all responses"""
+    response = await call_next(request)
+    
+    # Security Headers (Defense in Depth)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    
+    return response
+
+
 @app.middleware("http")
 async def logging_middleware(request: Request, call_next):
     """Request logging middleware"""
@@ -111,6 +126,21 @@ app.include_router(internal_tickets.router, prefix="/api/v1/internal/tickets", t
 app.include_router(comments.router, prefix="/api/v1/comments", tags=["Comments"])
 app.include_router(attachments.router, prefix="/api/v1/attachments", tags=["Attachments"])
 app.include_router(health.router, prefix="/api/v1/health", tags=["System Health"])
+
+from app.routers import reports
+app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports"])
+
+from app.routers import kb
+app.include_router(kb.router, prefix="/api/v1/kb", tags=["Knowledge Base"])
+
+from app.routers import problems
+app.include_router(problems.router, prefix="/api/v1/problems", tags=["Problems"])
+
+from app.routers import changes
+app.include_router(changes.router, prefix="/api/v1/changes", tags=["Changes"])
+
+from app.routers import assets
+app.include_router(assets.router, prefix="/api/v1/assets", tags=["Assets"])
 
 from app.routers import webhooks
 app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["Webhooks"])
