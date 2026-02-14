@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: PostgresDsn = Field(
-        default="postgresql+psycopg://atum:atum@localhost:5432/atum_desk"
+        default="postgresql+psycopg://postgres:postgres@localhost:5432/atum_desk"
     )
     DATABASE_POOL_SIZE: int = 20
     DATABASE_MAX_OVERFLOW: int = 10
