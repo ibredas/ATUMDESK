@@ -13,13 +13,14 @@ import asyncio
 
 from app.config import get_settings
 from app.db.init_db import init_db
-from app.routers import auth, users, tickets, internal_tickets, comments, attachments, health
+from app.routers import auth, users, tickets, internal_tickets, internal_rls, comments, attachments, health, rules, two_factor, audit, ticket_relationships, admin
 
 settings = get_settings()
 logger = structlog.get_logger()
 
 
 from app.services.email_ingestion import email_ingestion_service
+from app.routers.metrics import update_health_metrics
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,6 +32,9 @@ async def lifespan(app: FastAPI):
     
     # Start Email Ingestion
     asyncio.create_task(email_ingestion_service.start_polling())
+    
+    # Start health metrics background task
+    asyncio.create_task(update_health_metrics())
     
     yield
     # Shutdown
@@ -47,13 +51,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# CORS middleware - Strict policy for JWT-only auth
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL] if settings.FRONTEND_URL else ["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[settings.FRONTEND_URL] if settings.FRONTEND_URL else [],
+    allow_credentials=False,  # Important: False for JWT-only (no cookies)
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 
@@ -123,6 +127,7 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(tickets.router, prefix="/api/v1/tickets", tags=["Tickets"])
 app.include_router(internal_tickets.router, prefix="/api/v1/internal/tickets", tags=["Internal Tickets"])
+app.include_router(internal_rls.router, tags=["Internal RLS"])
 app.include_router(comments.router, prefix="/api/v1/comments", tags=["Comments"])
 app.include_router(attachments.router, prefix="/api/v1/attachments", tags=["Attachments"])
 app.include_router(health.router, prefix="/api/v1/health", tags=["System Health"])
@@ -132,6 +137,9 @@ app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports"])
 
 from app.routers import kb
 app.include_router(kb.router, prefix="/api/v1/kb", tags=["Knowledge Base"])
+
+from app.routers import kb_suggestions
+app.include_router(kb_suggestions.router, prefix="/api/v1/kb/suggestions", tags=["KB Suggestions"])
 
 from app.routers import problems
 app.include_router(problems.router, prefix="/api/v1/problems", tags=["Problems"])
@@ -148,11 +156,50 @@ app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["Webhooks"]
 from app.routers import analytics
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
 
+from app.routers import etl
+app.include_router(etl.router, tags=["ETL"])
+
 from app.routers import rag
 app.include_router(rag.router, prefix="/api/v1/rag", tags=["RAG"])
 
+from app.routers import copilot
+app.include_router(copilot.router, prefix="/api/v1/internal/tickets", tags=["Copilot"])
+
 from app.routers import assistant
 app.include_router(assistant.router, prefix="/api/v1/internal", tags=["Assistant"])
+
+from app.routers import metrics, rules, two_factor, audit
+
+app.include_router(rules.router, tags=["Rules"])
+app.include_router(metrics.router, tags=["Metrics"])
+app.include_router(two_factor.router, tags=["2FA"])
+app.include_router(audit.router, tags=["Audit"])
+app.include_router(ticket_relationships.router, tags=["Ticket Relationships"])
+
+# NEW ROUTERS - Phase 6 Enhancements
+from app.routers import ticket_locks
+app.include_router(ticket_locks.router, tags=["Ticket Locks"])
+
+from app.routers import playbooks
+app.include_router(playbooks.router, tags=["Playbooks"])
+
+from app.routers import forms
+app.include_router(forms.router, tags=["Service Forms"])
+
+from app.routers import notifications
+app.include_router(notifications.router, tags=["Notifications"])
+
+from app.routers import ai_analytics
+app.include_router(ai_analytics.router, tags=["AI Analytics"])
+
+from app.routers import policies
+app.include_router(policies.router, prefix="/api/v1/policies", tags=["Policy Center"])
+
+from app.routers import incidents
+app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["Incidents"])
+
+from app.routers import admin
+app.include_router(admin.router, tags=["Admin"])
 
 
 

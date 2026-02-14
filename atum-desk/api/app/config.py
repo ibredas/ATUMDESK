@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     DEBUG: bool = Field(default=False)
     ENVIRONMENT: str = Field(default="production")
     
+    # Data directories
+    DATA_DIR: str = "/opt/atum-desk/data"
+    
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000
@@ -80,13 +83,38 @@ class Settings(BaseSettings):
     
     # AI (Ollama)
     OLLAMA_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "ATUM-DESK-AI:latest"
-    OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text:latest"
-    OLLAMA_TIMEOUT: int = 30
+    OLLAMA_MODEL: str = "ATUM-DESK-COPILOT:latest"
+    OLLAMA_EMBEDDING_MODEL: str = "ATUM-DESK-AI:latest"
+    OLLAMA_TIMEOUT: int = 120
     AI_ENABLED: bool = True
+    
+    # AI Features - Elite Configuration
+    AI_AUTO_TRIAGE: bool = True
+    AI_AUTO_ASSIGN: bool = True
+    AI_SENTIMENT_ANALYSIS: bool = True
+    AI_SMARTER_REPLY: bool = True
+    AI_SLA_PREDICTION: bool = True
+    
+    # AI Response Caching
+    AI_CACHE_TTL_MINUTES: int = 30
+    AI_MAX_CACHE_SIZE: int = 1000
+    
+    # AI Model Routing
+    AI_FAST_MODEL: str = "qwen2.5:0.5b"
+    AI_STANDARD_MODEL: str = "ATUM-DESK-COPILOT:latest"
+    AI_ELITE_MODEL: str = "ATUM-DESK-COPILOT:latest"
+    AI_REASONING_MODEL: str = "deepseek-r1:1.5b"
+    
+    # RAG Config
+    RAG_ENABLED: bool = True
+    RAG_EMBED_DIM: int = 1536
+    RAG_TOP_K: int = 5
+    RAG_GRAPH_DEPTH: int = 2
+    RAG_HNSW_EF_SEARCH: int = 100
     # RAG Indexing: Disabled by default for stability. Enable via env var for Phase 3.
     # When enabled, tickets are indexed for semantic search via background task.
     RAG_INDEX_ON_TICKET_CREATE: bool = Field(default=False)
+    RAG_INDEX_ON_TICKET_RESOLVE: bool = True
     
     # Rate Limiting
     RATE_LIMIT_LOGIN: int = 5  # attempts per 15 minutes
@@ -107,6 +135,9 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"
+    
+    # RLS Guardrails
+    RLS_DEGRADED_MODE: bool = False  # Global kill switch
     
     # Frontend URL (for CORS and emails)
     FRONTEND_URL: str = "https://localhost"

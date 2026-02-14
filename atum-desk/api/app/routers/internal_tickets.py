@@ -12,6 +12,7 @@ from app.db.session import get_session
 from app.auth.deps import get_current_user
 from app.models.user import User, UserRole
 from app.models.ticket import Ticket, TicketStatus, TicketPriority
+from app.config import get_settings
 
 router = APIRouter()
 
@@ -100,9 +101,51 @@ async def accept_ticket(
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found or already accepted")
     
+    old_status = ticket.status.value
+    old_accepted_at = ticket.accepted_at
+    old_sla_started_at = ticket.sla_started_at
+    old_sla_due_at = ticket.sla_due_at
+    
     ticket.status = TicketStatus.ACCEPTED
     ticket.accepted_by = current_user.id
     ticket.accepted_at = datetime.utcnow()
+    
+    # Start SLA when ticket is accepted (only if not already started)
+    if not ticket.sla_started_at:
+        ticket.sla_started_at = datetime.utcnow()
+        
+        # Calculate SLA due dates based on policy and priority
+        if ticket.sla_policy_id:
+            from app.services.sla_service import SLAService
+            sla_service = SLAService(db)
+            await sla_service.calculate_targets(ticket)
+        else:
+            import logging
+            logging.getLogger("sla").warning(f"No SLA policy for ticket {ticket.id}, SLA started but no due date set")
+    
+    # Write audit log for acceptance with old and new values
+    from app.models.audit_log import AuditLog
+    audit = AuditLog(
+        organization_id=ticket.organization_id,
+        user_id=current_user.id,
+        action="ticket_accepted",
+        entity_type="ticket",
+        entity_id=ticket.id,
+        old_values={
+            "status": old_status,
+            "accepted_at": old_accepted_at.isoformat() if old_accepted_at else None,
+            "sla_started_at": old_sla_started_at.isoformat() if old_sla_started_at else None,
+            "sla_due_at": old_sla_due_at.isoformat() if old_sla_due_at else None
+        },
+        new_values={
+            "status": "ACCEPTED",
+            "accepted_by": str(current_user.id),
+            "accepted_at": ticket.accepted_at.isoformat() if ticket.accepted_at else None,
+            "sla_started_at": ticket.sla_started_at.isoformat() if ticket.sla_started_at else None,
+            "sla_due_at": ticket.sla_due_at.isoformat() if ticket.sla_due_at else None
+        }
+    )
+    db.add(audit)
     
     await db.flush()
     
@@ -192,12 +235,71 @@ async def update_ticket_status(
         if ticket.assigned_to != current_user.id:
             raise HTTPException(status_code=403, detail="Not assigned to this ticket")
     
+    old_status = ticket.status.value
+    old_sla_paused_at = ticket.sla_paused_at
+    old_sla_paused_duration = ticket.sla_paused_duration
+    
     ticket.status = status_data.status
+    
+    # Handle SLA pause for WAITING_CUSTOMER
+    now = datetime.utcnow()
+    if status_data.status == TicketStatus.WAITING_CUSTOMER:
+        # Entering WAITING_CUSTOMER - pause SLA if not already paused
+        if ticket.sla_started_at is not None and ticket.sla_paused_at is None:
+            ticket.sla_paused_at = now
+    elif old_status == TicketStatus.WAITING_CUSTOMER.value:
+        # Leaving WAITING_CUSTOMER - unpause SLA
+        if ticket.sla_paused_at is not None:
+            # Handle timezone-aware comparison
+            if ticket.sla_paused_at.tzinfo is not None:
+                pause_delta = now.replace(tzinfo=None) - ticket.sla_paused_at.replace(tzinfo=None)
+            else:
+                pause_delta = now - ticket.sla_paused_at
+            ticket.sla_paused_duration = (ticket.sla_paused_duration or 0) + int(pause_delta.total_seconds())
+            ticket.sla_paused_at = None
     
     if status_data.status == TicketStatus.RESOLVED:
         ticket.resolved_at = datetime.utcnow()
+        
+        # RAG Indexing on resolve (per spec - only resolved tickets are indexed)
+        settings = get_settings()
+        if settings.RAG_ENABLED and settings.RAG_INDEX_ON_TICKET_RESOLVE:
+            try:
+                from app.services.rag.indexer import enqueue_index
+                await enqueue_index(
+                    db,
+                    ticket.organization_id,
+                    "ticket",
+                    ticket.id,
+                    "upsert"
+                )
+            except Exception as e:
+                import logging
+                logging.getLogger("internal_tickets").warning(f"RAG indexing enqueue failed for ticket {ticket.id}: {e}", exc_info=True)
+                
     elif status_data.status == TicketStatus.CLOSED:
         ticket.closed_at = datetime.utcnow()
+    
+    # Audit Log for status change with pause info
+    from app.models.audit_log import AuditLog
+    audit = AuditLog(
+        organization_id=ticket.organization_id,
+        user_id=current_user.id,
+        action="ticket_status_changed",
+        entity_type="ticket",
+        entity_id=ticket.id,
+        old_values={
+            "status": old_status,
+            "sla_paused_at": old_sla_paused_at.isoformat() if old_sla_paused_at else None,
+            "sla_paused_duration": old_sla_paused_duration
+        },
+        new_values={
+            "status": status_data.status.value,
+            "sla_paused_at": ticket.sla_paused_at.isoformat() if ticket.sla_paused_at else None,
+            "sla_paused_duration": ticket.sla_paused_duration
+        }
+    )
+    db.add(audit)
     
     await db.flush()
     

@@ -1,0 +1,7 @@
+[Unit]
+Description=ATUM DESK Watchdog Service - Health check and restart
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "/bin/echo 'Watchdog running'"

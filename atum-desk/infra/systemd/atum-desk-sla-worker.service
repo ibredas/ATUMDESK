@@ -1,0 +1,36 @@
+[Unit]
+Description=ATUM DESK SLA Worker - SLA monitoring and alerts
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=navi
+WorkingDirectory=/data/ATUM DESK/atum-desk/api
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/data/ATUM DESK/atum-desk/api/.env
+ExecStart="/data/ATUM DESK/atum-desk/api/.venv/bin/python3" scripts/run_sla_worker.py
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Resource limits
+MemoryMax=256M
+MemoryHigh=192M
+CPUQuota=30%
+
+# File descriptor limit
+LimitNOFILE=2048
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ReadOnlyPaths=/data/ATUM DESK/atum-desk/api
+
+[Install]
+WantedBy=multi-user.target

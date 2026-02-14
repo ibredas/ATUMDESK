@@ -1,0 +1,31 @@
+[Unit]
+Description=ATUM DESK Metrics Snapshot Worker - Dashboard data capture
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=navi
+WorkingDirectory=/data/ATUM DESK/atum-desk/api
+Environment=PYTHONUNBUFFERED=1
+Environment=DATABASE_URL=postgresql+psycopg://atum:atum@localhost:5432/atum_desk
+Environment=SNAPSHOT_INTERVAL=30
+ExecStart=/data/ATUM\ DESK/atum-desk/api/.venv/bin/python /data/ATUM\ DESK/atum-desk/api/scripts/metrics_snapshot_worker.py
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Memory limit
+MemoryMax=200M
+
+# CPU limit
+CPUQuota=50%
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

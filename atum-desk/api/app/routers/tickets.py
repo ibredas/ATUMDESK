@@ -1,12 +1,15 @@
 """
 ATUM DESK - Tickets Router (Customer Portal)
 """
+import logging
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 from sqlalchemy import select, desc
+
+logger = logging.getLogger(__name__)
 
 from app.db.session import get_session
 from app.auth.deps import get_current_user
@@ -130,8 +133,15 @@ async def create_ticket(
     settings = get_settings()
     if settings.RAG_INDEX_ON_TICKET_CREATE:
         try:
-            from app.services.rag.indexer import index_ticket
-            background_tasks.add_task(index_ticket, new_ticket)
+            from app.services.rag.indexer import enqueue_index
+            background_tasks.add_task(
+                enqueue_index,
+                db,
+                new_ticket.organization_id,
+                "ticket",
+                new_ticket.id,
+                "upsert"
+            )
         except ImportError as e:
             import logging
             logging.getLogger("tickets_router").warning(f"RAG indexing skipped for ticket {new_ticket.id}: missing dependencies", exc_info=True)
@@ -200,20 +210,20 @@ async def create_ticket(
             db.add(auto_update_audit)
             await db.commit()
         
-    except Exception as e:
-        # Log error but don't fail the request
-        import logging
-        logging.getLogger("tickets_router").error(f"Failed to run Rules/SLA for ticket {new_ticket.id}: {e}")
-    # ---------------------------------
-
-    # Note: ticket_created audit was already written above (before auto logic)
-        await db.refresh(new_ticket)
+        # 3. Auto-assign ticket if enabled
+        settings = get_settings()
+        if settings.AI_AUTO_ASSIGN and not new_ticket.assigned_to:
+            try:
+                from app.services.ai.smart_assignment import smart_assign_ticket
+                assigned = await smart_assign_ticket(db, new_ticket)
+                if assigned:
+                    logger.info(f"Auto-assigned ticket {new_ticket.id}")
+            except Exception as e:
+                logger.error(f"Auto-assignment failed for ticket {new_ticket.id}: {e}")
         
     except Exception as e:
-        # Log error but don't fail the request
         import logging
         logging.getLogger("tickets_router").error(f"Failed to run Rules/SLA for ticket {new_ticket.id}: {e}")
-    # ---------------------------------
     
     # Audit Log for ticket creation
     from app.models.audit_log import AuditLog
@@ -231,6 +241,22 @@ async def create_ticket(
     )
     db.add(audit)
     await db.commit()
+    
+    # Enqueue AI jobs (non-blocking)
+    from app.services.job.queue import JobQueueService
+    job_queue = JobQueueService(db)
+    await job_queue.enqueue_ticket_triage(
+        ticket_id=str(new_ticket.id),
+        organization_id=str(new_ticket.organization_id)
+    )
+    await job_queue.enqueue_kb_suggest(
+        ticket_id=str(new_ticket.id),
+        organization_id=str(new_ticket.organization_id)
+    )
+    await job_queue.enqueue_sentiment_analysis(
+        ticket_id=str(new_ticket.id),
+        organization_id=str(new_ticket.organization_id)
+    )
     
     return TicketResponse(
         id=str(new_ticket.id),

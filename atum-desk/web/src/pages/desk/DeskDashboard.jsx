@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Wordmark } from '../../components/Brand/Wordmark'
+import DeskSidebar from '../../components/DeskSidebar'
+import AIInsightsPanel from '../../components/AIInsightsPanel'
 
 export default function DeskDashboard() {
   const navigate = useNavigate()
@@ -27,28 +29,10 @@ export default function DeskDashboard() {
     } catch (e) { console.error(e) }
   }
 
-  const logout = () => {
-    localStorage.removeItem('atum_desk_token')
-    localStorage.removeItem('atum_desk_refresh')
-    navigate('/desk/login')
-  }
 
   return (
     <div className="flex min-h-screen bg-[var(--bg-0)]">
-      {/* Sidebar */}
-      <div className="desk-sidebar">
-        <div className="px-6 mb-8">
-          <Wordmark className="h-6 text-[var(--accent-gold)]" suffix="DESK" />
-        </div>
-        <nav className="flex flex-col gap-1">
-          <Link to="/desk/dashboard" className="active">📊 Dashboard</Link>
-          <Link to="/desk/inbox">📥 Inbox</Link>
-          <div className="mt-auto pt-8">
-            <button onClick={logout}>🚪 Sign Out</button>
-          </div>
-        </nav>
-      </div>
-
+      <DeskSidebar />
       {/* Main */}
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">
@@ -75,6 +59,11 @@ export default function DeskDashboard() {
               <div className="stat-value text-[#f87171]">{stats.urgent}</div>
               <div className="stat-label">Urgent</div>
             </div>
+          </div>
+
+          {/* AI Insights */}
+          <div className="mb-10">
+            <AIInsightsPanel />
           </div>
 
           {/* Recent Tickets */}

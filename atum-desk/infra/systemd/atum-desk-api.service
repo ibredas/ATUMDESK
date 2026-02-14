@@ -1,10 +1,10 @@
 [Unit]
-Description=ATUM DESK API Service
-After=network.target postgresql.service redis.service
-Wants=postgresql.service redis.service
+Description=ATUM DESK API Service - Production Hardened
+After=network.target postgresql.service
+Wants=postgresql.service
 
 [Service]
-Type=simple
+Type=notify
 User=navi
 Group=navi
 WorkingDirectory=/data/ATUM DESK/atum-desk/api
@@ -12,13 +12,32 @@ Environment="PATH=/data/ATUM DESK/atum-desk/api/.venv/bin"
 Environment="PYTHONPATH=/data/ATUM DESK/atum-desk/api"
 Environment="ENVIRONMENT=production"
 Environment="DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/atum_desk"
-Environment="REDIS_URL=redis://localhost:6379/0"
-Environment="SECRET_KEY=atum-desk-production-secret-key-change-this"
+# Redis removed per NO REDIS constraint
 ExecStart=/data/ATUM DESK/atum-desk/api/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=mixed
-Restart=always
+Restart=on-failure
 RestartSec=5
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Resource limits
+MemoryMax=2G
+MemoryHigh=1G
+CPUQuota=150%
+
+# File descriptor limit
+LimitNOFILE=65536
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadOnlyPaths=/data/ATUM DESK/atum-desk/api
 
 [Install]
 WantedBy=multi-user.target

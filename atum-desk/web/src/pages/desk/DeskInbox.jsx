@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Wordmark } from '../../components/Brand/Wordmark'
+import DeskSidebar from '../../components/DeskSidebar'
 
 export default function DeskInbox() {
   const navigate = useNavigate()
@@ -28,11 +29,6 @@ export default function DeskInbox() {
     finally { setLoading(false) }
   }
 
-  const logout = () => {
-    localStorage.removeItem('atum_desk_token')
-    localStorage.removeItem('atum_desk_refresh')
-    navigate('/desk/login')
-  }
 
   const filtered = filter === 'all' ? tickets :
     tickets.filter(t => filter === 'open'
@@ -49,20 +45,7 @@ export default function DeskInbox() {
 
   return (
     <div className="flex min-h-screen bg-[var(--bg-0)]">
-      {/* Sidebar */}
-      <div className="desk-sidebar">
-        <div className="px-6 mb-8">
-          <Wordmark className="h-6 text-[var(--accent-gold)]" suffix="DESK" />
-        </div>
-        <nav className="flex flex-col gap-1">
-          <Link to="/desk/dashboard">📊 Dashboard</Link>
-          <Link to="/desk/inbox" className="active">📥 Inbox</Link>
-          <div className="mt-auto pt-8">
-            <button onClick={logout}>🚪 Sign Out</button>
-          </div>
-        </nav>
-      </div>
-
+      <DeskSidebar />
       {/* Main */}
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">
@@ -74,8 +57,8 @@ export default function DeskInbox() {
                   key={f.key}
                   onClick={() => setFilter(f.key)}
                   className={`text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full transition-all ${filter === f.key
-                      ? 'bg-[var(--accent-gold)] text-black'
-                      : 'text-[var(--text-2)] hover:text-white hover:bg-white/5 border border-[var(--glass-border)]'
+                    ? 'bg-[var(--accent-gold)] text-black'
+                    : 'text-[var(--text-2)] hover:text-white hover:bg-white/5 border border-[var(--glass-border)]'
                     }`}
                 >
                   {f.label}

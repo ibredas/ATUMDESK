@@ -1,0 +1,40 @@
+[Unit]
+Description=ATUM DESK RAG Worker - Vector Indexing Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=navi
+WorkingDirectory=/data/ATUM DESK/atum-desk/api
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/data/ATUM DESK/atum-desk/api/.env
+ExecStart=/bin/bash -c 'source .venv/bin/activate && python scripts/rag_worker.py'
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Resource limits
+MemoryMax=512M
+MemoryHigh=384M
+CPUQuota=100%
+
+# File descriptor limit
+LimitNOFILE=4096
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ReadOnlyPaths=/data/ATUM DESK/atum-desk/api
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=atum-desk-rag-worker
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,39 @@
+[Unit]
+Description=ATUM DESK Job Worker - PostgreSQL-backed queue processor
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=navi
+WorkingDirectory=/data/ATUM DESK/atum-desk/api
+Environment=PYTHONUNBUFFERED=1
+Environment=DATABASE_URL=postgresql+psycopg://atum:atum@localhost:5432/atum_desk
+Environment=OLLAMA_URL=http://localhost:11434
+Environment=OLLAMA_MODEL=ATUM-DESK-COPILOT:latest
+ExecStart=/data/ATUM\ DESK/atum-desk/api/.venv/bin/python /data/ATUM\ DESK/atum-desk/api/scripts/job_worker.py
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Resource limits
+MemoryMax=512M
+MemoryHigh=384M
+CPUQuota=50%
+
+# File descriptor limit
+LimitNOFILE=4096
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadOnlyPaths=/data/ATUM DESK/atum-desk/api
+
+[Install]
+WantedBy=multi-user.target

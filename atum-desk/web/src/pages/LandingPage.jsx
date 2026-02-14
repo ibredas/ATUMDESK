@@ -155,6 +155,316 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* AI Copilot Section - NEW */}
+            <section className="relative z-10 px-6 lg:px-12 py-24 bg-[rgba(5,5,5,0.3)]">
+                <div className="max-w-7xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--accent-gold)] mb-2">◆ AI Intelligence</h2>
+                        <div className="w-12 h-0.5 bg-[var(--accent-gold)] opacity-60"></div>
+                    </div>
+
+                    <h3 className="text-4xl font-bold mb-8">AI Copilot</h3>
+                    <p className="text-xl text-[var(--text-1)] max-w-2xl mb-12">
+                        Your intelligent assistant for support operations. Get AI-generated replies, 
+                        suggested actions, and contextual insights — all with full audit trails.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🤖</div>
+                            <h4 className="text-lg font-bold mb-3">Smart Replies</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• AI draft responses</li>
+                                <li>• Context-aware suggestions</li>
+                                <li>• Confidence scores</li>
+                                <li>• One-click apply</li>
+                            </ul>
+                        </div>
+
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">📋</div>
+                            <h4 className="text-lg font-bold mb-3">Action Checklist</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Suggested next steps</li>
+                                <li>• Auto-triage options</li>
+                                <li>• Priority recommendations</li>
+                                <li>• Assignment hints</li>
+                            </ul>
+                        </div>
+
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🔍</div>
+                            <h4 className="text-lg font-bold mb-3">Evidence Cards</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• KB article citations</li>
+                                <li>• Similar ticket references</li>
+                                <li>• Full trace replay</li>
+                                <li>• Citable sources</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-12">
+                        <Link
+                            to="/desk/ai/agent-assist"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-gold)] text-black font-bold rounded-full hover:scale-105 transition-transform"
+                        >
+                            Open AI Copilot →
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* GraphRAG Knowledge Brain Section - NEW */}
+            <section className="relative z-10 px-6 lg:px-12 py-24">
+                <div className="max-w-7xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-2">Knowledge</h2>
+                        <div className="w-12 h-0.5 bg-[var(--accent-gold)] opacity-60"></div>
+                    </div>
+
+                    <h3 className="text-4xl font-bold mb-8">GraphRAG Knowledge Brain</h3>
+                    <p className="text-xl text-[var(--text-1)] max-w-2xl mb-12">
+                        AI-powered knowledge base with graph relationships. Contextual search, 
+                        auto-suggestions, and intelligent deflection for faster resolutions.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🧠</div>
+                            <h4 className="text-lg font-bold mb-3">Graph Search</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Semantic vector search</li>
+                                <li>• Relationship traversal</li>
+                                <li>• Context chains</li>
+                                <li>• Multi-hop queries</li>
+                            </ul>
+                        </div>
+
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">💡</div>
+                            <h4 className="text-lg font-bold mb-3">Smart Deflection</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Auto-suggest articles</li>
+                                <li>• Customer self-service</li>
+                                <li>• Voting system</li>
+                                <li>• Relevance scoring</li>
+                            </ul>
+                        </div>
+
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">📊</div>
+                            <h4 className="text-lg font-bold mb-3">Vector Indexing</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• pgvector HNSW</li>
+                                <li>• Background workers</li>
+                                <li>• Incremental updates</li>
+                                <li>• Full-text + semantic</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-12">
+                        <Link
+                            to="/desk/kb"
+                            className="inline-flex items-center gap-2 px-6 py-3 border border-[var(--glass-border)] text-white font-bold rounded-full hover:border-[var(--accent-gold)] transition-colors"
+                        >
+                            Open Knowledge Base →
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Security & 2FA Section - NEW */}
+            <section className="relative z-10 px-6 lg:px-12 py-24 bg-[rgba(5,5,5,0.3)]">
+                <div className="max-w-7xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-2">Security</h2>
+                        <div className="w-12 h-0.5 bg-[var(--accent-gold)] opacity-60"></div>
+                    </div>
+
+                    <h3 className="text-4xl font-bold mb-8">Enterprise Security</h3>
+                    <p className="text-xl text-[var(--text-1)] max-w-2xl mb-12">
+                        Bank-grade security with 2FA, audit logging, IP restrictions, and 
+                        role-based access control. Your data stays protected.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🔐</div>
+                            <h4 className="text-lg font-bold mb-3">2FA / TOTP</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Time-based OTP</li>
+                                <li>• Recovery codes</li>
+                                <li>• Org-wide enforcement</li>
+                                <li>• QR code setup</li>
+                            </ul>
+                        </div>
+
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">📝</div>
+                            <h4 className="text-lg font-bold mb-3">Audit Logs</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Full action history</li>
+                                <li>• Export to CSV</li>
+                                <li>• Retention policies</li>
+                                <li>• Searchable</li>
+                            </ul>
+                        </div>
+
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🌐</div>
+                            <h4 className="text-lg font-bold mb-3">IP Restrictions</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• CIDR allowlisting</li>
+                                <li>• Admin endpoints</li>
+                                <li>• Per-org settings</li>
+                                <li>• VPN support</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-12">
+                        <Link
+                            to="/desk/admin/security"
+                            className="inline-flex items-center gap-2 px-6 py-3 border border-[var(--glass-border)] text-white font-bold rounded-full hover:border-[var(--accent-gold)] transition-colors"
+                        >
+                            Security Settings →
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Workflow Designer Section - NEW */}
+            <section className="relative z-10 px-6 lg:px-12 py-24 bg-[rgba(5,5,5,0.3)]">
+                <div className="max-w-7xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-2">Automation</h2>
+                        <div className="w-12 h-0.5 bg-[var(--accent-gold)] opacity-60"></div>
+                    </div>
+
+                    <h3 className="text-4xl font-bold mb-8">Workflow Designer</h3>
+                    <p className="text-xl text-[var(--text-1)] max-w-2xl mb-12">
+                        Build powerful automation workflows without code. Trigger actions based on ticket events, status changes, and SLA warnings.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Card 1: Triggers */}
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">⚡</div>
+                            <h4 className="text-lg font-bold mb-3">Triggers</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Ticket created</li>
+                                <li>• Status changed</li>
+                                <li>• SLA warning (75%/90%)</li>
+                                <li>• Priority escalated</li>
+                                <li>• Customer replied</li>
+                            </ul>
+                        </div>
+
+                        {/* Card 2: Actions */}
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🎯</div>
+                            <h4 className="text-lg font-bold mb-3">Actions</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Assign to agent/team</li>
+                                <li>• Set fields/priority</li>
+                                <li>• Send notifications</li>
+                                <li>• Trigger webhook</li>
+                                <li>• Create follow-up</li>
+                            </ul>
+                        </div>
+
+                        {/* Card 3: Safe Preview */}
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🔒</div>
+                            <h4 className="text-lg font-bold mb-3">Safe Preview</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Validate before publish</li>
+                                <li>• Simulate execution</li>
+                                <li>• Test mode support</li>
+                                <li>• Full audit trail</li>
+                                <li>• Rollback anytime</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-12">
+                        <Link
+                            to="/desk/workflows"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--text-0)] text-black font-bold rounded-full hover:scale-105 transition-transform"
+                        >
+                            Open Workflow Designer →
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Monitoring & Self-Healing Section - NEW */}
+            <section className="relative z-10 px-6 lg:px-12 py-24">
+                <div className="max-w-7xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-2">Observability</h2>
+                        <div className="w-12 h-0.5 bg-[var(--accent-gold)] opacity-60"></div>
+                    </div>
+
+                    <h3 className="text-4xl font-bold mb-8">Monitoring & Self-Healing</h3>
+                    <p className="text-xl text-[var(--text-1)] max-w-2xl mb-12">
+                        Enterprise-grade observability with automatic service recovery. Stay ahead of issues with real-time health checks and Prometheus metrics.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Card 1: Live Health */}
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">💚</div>
+                            <h4 className="text-lg font-bold mb-3">Live Health</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• API Service: Healthy</li>
+                                <li>• SLA Worker: Healthy</li>
+                                <li>• RAG Worker: Healthy</li>
+                                <li>• Job Worker: Healthy</li>
+                                <li>• Database: Connected</li>
+                            </ul>
+                        </div>
+
+                        {/* Card 2: Metrics */}
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">📈</div>
+                            <h4 className="text-lg font-bold mb-3">Prometheus Metrics</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Request rate</li>
+                                <li>• Response time p50/p95</li>
+                                <li>• Error rate</li>
+                                <li>• DB pool usage</li>
+                                <li>• Queue depth</li>
+                            </ul>
+                        </div>
+
+                        {/* Card 3: Self-Healing */}
+                        <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] hover:border-[var(--accent-gold)] transition-colors">
+                            <div className="text-3xl mb-4">🛡️</div>
+                            <h4 className="text-lg font-bold mb-3">Self-Healing</h4>
+                            <ul className="text-sm text-[var(--text-2)] space-y-2">
+                                <li>• Restart on failure</li>
+                                <li>• Memory caps enforced</li>
+                                <li>• Watchdog timer</li>
+                                <li>• Rate limiting</li>
+                                <li>• Circuit breaker</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-12">
+                        <Link
+                            to="/desk/monitoring"
+                            className="inline-flex items-center gap-2 px-6 py-3 border border-[var(--accent-gold)] text-[var(--accent-gold)] font-bold rounded-full hover:bg-[var(--accent-gold)] hover:text-black transition-colors"
+                        >
+                            Open Monitoring →
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
             {/* Footer */}
             <footer className="relative z-10 border-t border-[var(--glass-border)] py-12 px-6 lg:px-12 bg-black/60 backdrop-blur-xl">
                 <div className="flex flex-col md:flex-row justify-between items-center opacity-60 text-[10px] uppercase tracking-widest text-[var(--text-1)]">

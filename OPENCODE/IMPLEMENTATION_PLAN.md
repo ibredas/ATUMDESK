@@ -18,32 +18,32 @@
 ## 📋 DELIVERABLES CHECKLIST
 
 ### Core Deliverables (Required)
-- [ ] **A** - Complete repo in `atum-desk/`
-- [ ] **B** - Web UI (landing page + portal + desk)
-- [ ] **C** - Backend API (FastAPI + PostgreSQL + Alembic)
-- [ ] **D** - Database schema + migrations
-- [ ] **E** - Upload subsystem with security
-- [ ] **F** - SLA subsystem (advanced with business hours)
-- [ ] **G** - SMTP notifications
-- [ ] **H** - systemd + nginx + install scripts
-- [ ] **I** - RUNBOOK.md + ACCEPTANCE_TESTS.md
-- [ ] **J** - First ticket E2E proof
+- [x] **A** - Complete repo in `atum-desk/`
+- [x] **B** - Web UI (landing page + portal + desk)
+- [x] **C** - Backend API (FastAPI + PostgreSQL + Alembic)
+- [x] **D** - Database schema + migrations
+- [x] **E** - Upload subsystem with security
+- [x] **F** - SLA subsystem (advanced with business hours)
+- [x] **G** - SMTP notifications
+- [x] **H** - systemd + nginx + install scripts
+- [x] **I** - RUNBOOK.md + ACCEPTANCE_TESTS.md
+- [x] **J** - First ticket E2E proof
 
 ### Enhanced Deliverables (Option C)
-- [ ] **K** - WebSocket real-time updates
-- [ ] **L** - Knowledge Base (customer + internal)
-- [ ] **M** - Canned responses & templates
-- [ ] **N** - Advanced search & filtering
-- [ ] **O** - Time tracking system
+- [x] **K** - WebSocket real-time updates
+- [x] **L** - Knowledge Base (customer + internal)
+- [x] **M** - Canned responses & templates
+- [x] **N** - Advanced search & filtering
+- [x] **O** - Time tracking system
 - [ ] **P** - Ticket relationships (parent/child/duplicate)
-- [ ] **Q** - Custom fields system
-- [ ] **R** - CSAT satisfaction surveys
-- [ ] **S** - Dashboard & analytics
-- [ ] **T** - AI Triage (Ollama)
-- [ ] **U** - AI-Assisted responses
-- [ ] **V** - Immutable audit logs
+- [x] **Q** - Custom fields system
+- [x] **R** - CSAT satisfaction surveys
+- [x] **S** - Dashboard & analytics
+- [x] **T** - AI Triage (Ollama)
+- [x] **U** - AI-Assisted responses
+- [x] **V** - Immutable audit logs
 - [ ] **W** - IP restrictions
-- [ ] **X** - Two-Factor Authentication (2FA)
+- [ ] **X** - Two-Factor Authentication (2FA) - Model exists, endpoints pending
 
 ---
 
