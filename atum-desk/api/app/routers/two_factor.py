@@ -170,10 +170,56 @@ async def disable_2fa(
 
 @router.get("/status")
 async def get_2fa_status(
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session)
 ):
-    """Get 2FA status for current user"""
+    """Get 2FA status for current user + org policy"""
+    from sqlalchemy import text
+    # Gap 12: Check org require_2fa policy
+    result = await db.execute(
+        text("SELECT require_2fa FROM org_settings WHERE organization_id = :org_id"),
+        {"org_id": str(current_user.organization_id)}
+    )
+    row = result.fetchone()
+    org_requires = row[0] if row else False
+    
     return {
         "enabled": current_user.two_factor_enabled,
-        "has_backup_codes": bool(current_user.two_factor_backup_codes)
+        "has_backup_codes": bool(current_user.two_factor_backup_codes),
+        "org_requires_2fa": org_requires,
+        "enforcement_needed": org_requires and not current_user.two_factor_enabled
     }
+
+
+class OrgPolicyRequest(BaseModel):
+    require_2fa: bool
+
+
+@router.put("/org-policy")
+async def update_2fa_org_policy(
+    request: OrgPolicyRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session)
+):
+    """Gap 12: Admin endpoint to require/waive 2FA for entire org"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    from sqlalchemy import text
+    await db.execute(
+        text("UPDATE org_settings SET require_2fa = :val WHERE organization_id = :org_id"),
+        {"val": request.require_2fa, "org_id": str(current_user.organization_id)}
+    )
+    
+    audit = AuditLog(
+        organization_id=current_user.organization_id,
+        user_id=current_user.id,
+        action="org_policy_2fa_updated",
+        entity_type="organization",
+        entity_id=current_user.organization_id,
+        new_values={"require_2fa": request.require_2fa}
+    )
+    db.add(audit)
+    await db.commit()
+    
+    return {"message": f"2FA policy set to {'required' if request.require_2fa else 'optional'}"}

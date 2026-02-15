@@ -4,7 +4,7 @@ ATUM DESK - FastAPI Application Configuration
 from functools import lru_cache
 from typing import List, Optional
 from pydantic_settings import BaseSettings
-from pydantic import Field, PostgresDsn, RedisDsn
+from pydantic import Field, PostgresDsn
 
 
 class Settings(BaseSettings):
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(default="production")
     
     # Data directories
-    DATA_DIR: str = "/opt/atum-desk/data"
+    DATA_DIR: str = "/data/ATUM DESK/atum-desk/data"
     
     # Server
     HOST: str = "0.0.0.0"
@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     DATABASE_POOL_SIZE: int = 20
     DATABASE_MAX_OVERFLOW: int = 10
     
-    # Redis
-    REDIS_URL: RedisDsn = Field(default="redis://localhost:6379/1")
+    # Redis removed — forbidden by architecture constraints
+    # Use PostgreSQL-backed job queue only
     
     # Security
     SECRET_KEY: str = Field(default="your-secret-key-change-in-production")

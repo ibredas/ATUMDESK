@@ -21,7 +21,7 @@ async def health_check(
     """
     Check system health:
     - Database connectivity
-    - Redis connectivity (if enabled)
+    
     - Disk space
     """
     health_status = {

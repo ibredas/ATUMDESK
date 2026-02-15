@@ -44,19 +44,19 @@ export function Modal({
       
       {/* Modal Content */}
       <div className={`relative w-full ${sizes[size]} mx-4 ${className}`}>
-        <div className="bg-[var(--bg-1)] border border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+        <div className="bg-[var(--bg-1)] border border-[var(--atum-border)] rounded-xl shadow-2xl overflow-hidden">
           {/* Header */}
           {(title || showClose) && (
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--atum-border)]">
               {title && (
-                <h2 className="text-lg font-semibold text-[var(--text-0)]">
+                <h2 className="text-lg font-semibold text-[var(--atum-text)]">
                   {title}
                 </h2>
               )}
               {showClose && (
                 <button
                   onClick={onClose}
-                  className="p-1 text-[var(--text-muted)] hover:text-[var(--text-0)] transition-colors"
+                  className="p-1 text-[var(--atum-text-muted)] hover:text-[var(--atum-text)] transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -72,7 +72,7 @@ export function Modal({
           </div>
           
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-[var(--border)] bg-[var(--bg-2)]">
+          <div className="px-6 py-4 border-t border-[var(--atum-border)] bg-[var(--atum-bg-2)]">
             {/* Footer content can be passed as children */}
           </div>
         </div>

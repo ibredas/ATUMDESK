@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import DeskSidebar from '../../../components/DeskSidebar'
+import { PageShell, GlassCard } from '../../../components/Premium'
 import { Table } from '../../../design-system/components/Table'
 import { Button } from '../../../design-system/components/Button'
 import { Badge } from '../../../design-system/components/Badge'
 import { Input, Textarea, Select } from '../../../design-system/components/Input'
 import { Modal, ModalFooter } from '../../../design-system/components/Modal'
+import { FileText, Plus, Trash2 } from 'lucide-react'
 
 const API = '/api/v1/forms/services'
 
@@ -41,17 +42,9 @@ export default function AdminFormsStudio() {
         try {
             let parsedFields = []
             try { parsedFields = JSON.parse(newForm.fields) } catch { parsedFields = [] }
-
             const res = await fetch(API, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    name: newForm.name,
-                    description: newForm.description,
-                    category: newForm.category,
-                    fields: parsedFields,
-                    is_active: true
-                })
+                method: 'POST', headers,
+                body: JSON.stringify({ name: newForm.name, description: newForm.description, category: newForm.category, fields: parsedFields, is_active: true })
             })
             if (res.ok) {
                 setShowCreate(false)
@@ -64,10 +57,8 @@ export default function AdminFormsStudio() {
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this form template?')) return
-        try {
-            await fetch(`${API}/${id}`, { method: 'DELETE', headers })
-            fetchForms()
-        } catch (e) { console.error(e) }
+        try { await fetch(`${API}/${id}`, { method: 'DELETE', headers }); fetchForms() }
+        catch (e) { console.error(e) }
     }
 
     const columns = [
@@ -78,45 +69,40 @@ export default function AdminFormsStudio() {
         { key: 'created_at', label: 'Created', render: (v) => <span className="text-xs">{v ? new Date(v).toLocaleDateString() : '—'}</span> },
         {
             key: 'id', label: '', render: (v) => (
-                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(v) }}>🗑</Button>
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(v) }}>
+                    <Trash2 size={14} />
+                </Button>
             )
         },
     ]
 
     return (
-        <div className="flex min-h-screen bg-[var(--bg-0)]">
-            <DeskSidebar />
-            <div className="flex-1 p-8">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h1 className="text-2xl font-bold">Forms Studio</h1>
-                            <p className="text-sm text-[var(--text-2)] mt-1">Create and manage service request form templates</p>
+        <PageShell
+            title="Forms Studio"
+            subtitle="Create and manage service request form templates"
+            actions={<Button onClick={() => setShowCreate(true)}><Plus size={14} className="mr-1" /> New Form</Button>}
+        >
+            <GlassCard>
+                <div className="p-6">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-16">
+                            <div className="w-8 h-8 border-2 border-[var(--atum-accent-gold)] border-t-transparent rounded-full animate-spin"></div>
                         </div>
-                        <Button onClick={() => setShowCreate(true)}>+ New Form</Button>
-                    </div>
-
-                    <div className="glass-panel rounded-xl p-6">
-                        {loading ? (
-                            <div className="flex items-center justify-center py-16"><div className="spinner"></div></div>
-                        ) : forms.length === 0 ? (
-                            <div className="text-center py-16 text-[var(--text-2)]">
-                                <div className="text-4xl mb-3">📝</div>
-                                <p className="text-sm">No form templates yet</p>
-                                <Button variant="outline" className="mt-4" onClick={() => setShowCreate(true)}>Create First Form</Button>
-                            </div>
-                        ) : (
-                            <Table columns={columns} data={forms} />
-                        )}
-                    </div>
-
-                    <div className="mt-4 text-[10px] text-[var(--text-2)] uppercase tracking-widest">
-                        {forms.length} form{forms.length !== 1 ? 's' : ''}
-                    </div>
+                    ) : forms.length === 0 ? (
+                        <div className="text-center py-16 text-[var(--atum-text-muted)]">
+                            <FileText size={48} className="mx-auto mb-3 opacity-20" />
+                            <p className="text-sm">No form templates yet</p>
+                            <Button variant="outline" className="mt-4" onClick={() => setShowCreate(true)}>Create First Form</Button>
+                        </div>
+                    ) : (
+                        <Table columns={columns} data={forms} />
+                    )}
                 </div>
+            </GlassCard>
+            <div className="mt-4 text-[10px] text-[var(--atum-text-muted)] uppercase tracking-widest">
+                {forms.length} form{forms.length !== 1 ? 's' : ''}
             </div>
 
-            {/* Create Modal */}
             {showCreate && (
                 <Modal title="Create Form Template" onClose={() => setShowCreate(false)}>
                     <div className="space-y-4">
@@ -147,6 +133,6 @@ export default function AdminFormsStudio() {
                     </ModalFooter>
                 </Modal>
             )}
-        </div>
+        </PageShell>
     )
 }

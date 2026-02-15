@@ -92,6 +92,10 @@ async def login(
     from app.config import get_settings
     settings = get_settings()
     
+    # NOTE: CSRF protection is NOT needed for JWT authentication
+    # JWT tokens are sent in Authorization header, not cookies
+    # CSRF attacks only affect cookie-based authentication
+    
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,

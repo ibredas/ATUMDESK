@@ -226,3 +226,116 @@ async def dashboard_widgets():
             pass
     
     return result
+
+
+@router.get("/api/v1/metrics/live")
+async def metrics_live():
+    """
+    Live metrics snapshot — real-time job queue, DB health, and agent load.
+    Gap 10: /metrics/live endpoint.
+    """
+    from sqlalchemy import text
+    from app.db.base import engine
+    
+    result = {
+        "timestamp": None,
+        "job_queue": {},
+        "db_healthy": False,
+        "agent_load": {}
+    }
+    
+    import datetime
+    result["timestamp"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    async with engine.connect() as conn:
+        try:
+            await conn.execute(text("SELECT 1"))
+            result["db_healthy"] = True
+        except Exception:
+            pass
+        
+        # Job queue status
+        try:
+            r = await conn.execute(text(
+                "SELECT job_type, status, COUNT(*) FROM job_queue GROUP BY job_type, status ORDER BY 1, 2"
+            ))
+            for row in r:
+                jtype = row[0]
+                if jtype not in result["job_queue"]:
+                    result["job_queue"][jtype] = {}
+                result["job_queue"][jtype][row[1]] = row[2]
+        except Exception:
+            pass
+        
+        # Agent load
+        try:
+            r = await conn.execute(text("""
+                SELECT u.id, u.full_name, COUNT(t.id) as open_tickets
+                FROM users u
+                LEFT JOIN tickets t ON t.assigned_to = u.id AND t.status NOT IN ('resolved', 'closed')
+                WHERE u.role IN ('agent', 'admin')
+                GROUP BY u.id, u.full_name
+                ORDER BY open_tickets DESC LIMIT 20
+            """))
+            for row in r:
+                result["agent_load"][str(row[0])] = {
+                    "name": row[1],
+                    "open_tickets": row[2]
+                }
+        except Exception:
+            pass
+    
+    return result
+
+
+@router.get("/api/v1/metrics/history")
+async def metrics_history(range: str = "24h"):
+    """
+    Historical metrics snapshots.
+    Gap 10: /metrics/history endpoint.
+    Args:
+        range: Time range — 1h, 6h, 24h, 7d, 30d
+    """
+    from sqlalchemy import text
+    from app.db.base import engine
+    
+    interval_map = {
+        "1h": "1 hour",
+        "6h": "6 hours",
+        "24h": "24 hours",
+        "7d": "7 days",
+        "30d": "30 days"
+    }
+    interval = interval_map.get(range, "24 hours")
+    
+    snapshots = []
+    async with engine.connect() as conn:
+        try:
+            r = await conn.execute(text(f"""
+                SELECT id, organization_id, snapshot_ts,
+                       tickets_by_status, tickets_by_priority,
+                       frt_p50, frt_p95, mttr_p50, mttr_p95,
+                       sla_compliance_pct, agent_load
+                FROM metrics_snapshots
+                WHERE snapshot_ts >= NOW() - INTERVAL '{interval}'
+                ORDER BY snapshot_ts DESC
+                LIMIT 500
+            """))
+            for row in r:
+                snapshots.append({
+                    "id": str(row[0]),
+                    "organization_id": str(row[1]) if row[1] else None,
+                    "snapshot_ts": row[2].isoformat() if row[2] else None,
+                    "tickets_by_status": row[3],
+                    "tickets_by_priority": row[4],
+                    "frt_p50": row[5],
+                    "frt_p95": row[6],
+                    "mttr_p50": row[7],
+                    "mttr_p95": row[8],
+                    "sla_compliance_pct": row[9],
+                    "agent_load": row[10]
+                })
+        except Exception:
+            pass
+    
+    return {"items": snapshots, "range": range, "count": len(snapshots)}

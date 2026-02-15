@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { PageShell, GlassCard } from '../../components/Premium'
+import { Siren, CheckCircle, Plus, X } from 'lucide-react'
+import ActivityTimeline from '../../components/ActivityTimeline'
 
 const API = '/api/v1/incidents'
 
@@ -52,106 +55,69 @@ export default function DeskIncidents() {
     }
 
     return (
-        <div className="desk-page">
-            <div className="desk-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                    <h1>🚨 Incidents</h1>
-                    <p style={{ color: 'var(--text-2)' }}>Major incident tracking & management</p>
-                </div>
-                <button
-                    onClick={() => setShowCreate(!showCreate)}
-                    style={{
-                        padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                        background: 'var(--accent, #c9a227)', color: '#000', fontWeight: 600
-                    }}
-                >
-                    {showCreate ? 'Cancel' : '+ Declare Incident'}
-                </button>
-            </div>
+        <PageShell title="Incidents" icon={Siren} subtitle="Major incident tracking & management"
+            actions={<button onClick={() => setShowCreate(!showCreate)} className="btn-gold flex items-center gap-2">{showCreate ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Declare Incident</>}</button>}>
 
             {error && (
-                <div style={{ padding: '12px 16px', background: '#ef444420', border: '1px solid #ef4444', borderRadius: '8px', marginBottom: '16px', color: '#ef4444' }}>
-                    {error}
-                </div>
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-4">{error}</div>
             )}
 
             {showCreate && (
-                <div className="glass-panel" style={{ padding: '24px', borderRadius: '12px', marginBottom: '16px', border: '1px solid var(--glass-border)' }}>
-                    <h3 style={{ marginBottom: '16px' }}>Declare New Incident</h3>
-                    <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <input
-                            placeholder="Incident title..."
-                            value={form.title}
-                            onChange={e => setForm({ ...form, title: e.target.value })}
-                            required
-                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--bg-2, #1a1a2e)', color: 'var(--text-1)' }}
-                        />
-                        <select
-                            value={form.severity}
-                            onChange={e => setForm({ ...form, severity: e.target.value })}
-                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--bg-2, #1a1a2e)', color: 'var(--text-1)' }}
-                        >
+                <GlassCard className="mb-6">
+                    <h3 className="font-semibold mb-4">Declare New Incident</h3>
+                    <form onSubmit={handleCreate} className="flex flex-col gap-3">
+                        <input placeholder="Incident title..." value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required className="atum-input" />
+                        <select value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })} className="atum-input">
                             <option value="SEV1">SEV-1 (Critical)</option>
                             <option value="SEV2">SEV-2 (High)</option>
                             <option value="SEV3">SEV-3 (Medium)</option>
                             <option value="SEV4">SEV-4 (Low)</option>
                         </select>
-                        <textarea
-                            placeholder="Customer impact summary..."
-                            value={form.customer_impact_summary}
-                            onChange={e => setForm({ ...form, customer_impact_summary: e.target.value })}
-                            rows={3}
-                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--bg-2, #1a1a2e)', color: 'var(--text-1)', resize: 'vertical' }}
-                        />
-                        <button type="submit" style={{ padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
-                            🚨 Declare Incident
-                        </button>
+                        <textarea placeholder="Customer impact summary..." value={form.customer_impact_summary} onChange={e => setForm({ ...form, customer_impact_summary: e.target.value })} rows={3} className="atum-input" style={{ resize: 'vertical' }} />
+                        <button type="submit" className="btn-gold flex items-center justify-center gap-2"><Siren size={16} /> Declare Incident</button>
                     </form>
-                </div>
+                </GlassCard>
             )}
 
-            <div className="glass-panel" style={{ borderRadius: '12px', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
+            <GlassCard>
                 {loading ? (
-                    <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-2)' }}>Loading incidents...</div>
+                    <div className="p-10 text-center text-[var(--atum-text-muted)]">Loading incidents...</div>
                 ) : incidents.length === 0 ? (
-                    <div style={{ padding: '40px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '12px' }}>✅</div>
-                        <h3>No Active Incidents</h3>
-                        <p style={{ color: 'var(--text-2)' }}>All systems operational</p>
+                    <div className="p-10 text-center">
+                        <CheckCircle size={48} className="mx-auto mb-3 text-green-400" />
+                        <h3 className="font-semibold">No Active Incidents</h3>
+                        <p className="text-[var(--atum-text-muted)]">All systems operational</p>
                     </div>
                 ) : (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                                <th style={{ padding: '12px 16px', textAlign: 'left' }}>Severity</th>
-                                <th style={{ padding: '12px 16px', textAlign: 'left' }}>Title</th>
-                                <th style={{ padding: '12px 16px', textAlign: 'left' }}>Status</th>
-                                <th style={{ padding: '12px 16px', textAlign: 'left' }}>Started</th>
-                            </tr>
-                        </thead>
+                    <table className="glass-table">
+                        <thead><tr><th>Severity</th><th>Title</th><th>Status</th><th>Started</th></tr></thead>
                         <tbody>
                             {incidents.map(inc => (
-                                <tr key={inc.id} style={{ borderBottom: '1px solid var(--glass-border, #333)' }}>
-                                    <td style={{ padding: '12px 16px' }}>
-                                        <span style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700, background: sevColor(inc.severity) + '20', color: sevColor(inc.severity) }}>
-                                            {inc.severity}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '12px 16px', fontWeight: 500 }}>{inc.title}</td>
-                                    <td style={{ padding: '12px 16px' }}>
-                                        <span style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, background: statusColor(inc.status) + '20', color: statusColor(inc.status) }}>
-                                            {inc.status}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '12px 16px', color: 'var(--text-2)', fontSize: '0.9rem' }}>
-                                        {inc.start_at ? new Date(inc.start_at).toLocaleString() : '—'}
-                                    </td>
+                                <tr key={inc.id}>
+                                    <td><span className="badge" style={{ background: sevColor(inc.severity) + '20', color: sevColor(inc.severity) }}>{inc.severity}</span></td>
+                                    <td className="font-medium">{inc.title}</td>
+                                    <td><span className="badge" style={{ background: statusColor(inc.status) + '20', color: statusColor(inc.status) }}>{inc.status}</span></td>
+                                    <td className="text-[var(--atum-text-muted)] text-sm">{inc.start_at ? new Date(inc.start_at).toLocaleString() : '—'}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 )}
-            </div>
-        </div>
+            </GlassCard>
+
+            {/* Incident Activity Timeline */}
+            {incidents.length > 0 && (
+                <GlassCard title="Incident Activity" className="mt-6">
+                    <ActivityTimeline events={incidents.slice(0, 10).map(inc => ({
+                        id: inc.id,
+                        type: inc.severity === 'SEV1' ? 'error' : inc.severity === 'SEV2' ? 'warning' : 'info',
+                        title: inc.title,
+                        description: `${inc.severity} — ${inc.status}${inc.customer_impact_summary ? ': ' + inc.customer_impact_summary : ''}`,
+                        timestamp: inc.start_at || inc.created_at,
+                        badge: inc.status
+                    }))} />
+                </GlassCard>
+            )}
+        </PageShell>
     )
 }

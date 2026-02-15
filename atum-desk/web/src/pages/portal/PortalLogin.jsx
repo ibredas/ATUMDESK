@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Wordmark } from '../../components/Brand/Wordmark'
 import AtumSilhouette from '../../assets/atum/atum-silhouette.svg'
 import GlyphPattern from '../../assets/atum/glyph-pattern.svg'
+import { Eye, EyeOff, AlertTriangle } from 'lucide-react'
 
 export default function PortalLogin() {
   const navigate = useNavigate()
@@ -46,7 +47,7 @@ export default function PortalLogin() {
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[var(--bg-0)] text-[var(--text-0)]">
+    <div className="relative min-h-screen w-full overflow-hidden bg-[var(--atum-bg)] text-[var(--atum-text)]">
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -65,7 +66,7 @@ export default function PortalLogin() {
 
           <div className="glass-panel relative w-full p-8 sm:p-12 rounded-2xl border-t border-[rgba(255,255,255,0.1)] shadow-2xl backdrop-blur-xl transform transition-all duration-500 hover:translate-y-[-2px] animate-rise overflow-hidden">
 
-            <Link to="/" className="absolute top-6 left-6 text-[var(--text-2)] hover:text-white transition-colors text-sm">
+            <Link to="/" className="absolute top-6 left-6 text-[var(--atum-text-muted)] hover:text-white transition-colors text-sm">
               ← Back
             </Link>
 
@@ -84,7 +85,7 @@ export default function PortalLogin() {
                 <div className="flex justify-center mb-6">
                   <Wordmark className="h-12 text-[#60a5fa] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" suffix="PORTAL" />
                 </div>
-                <p className="text-[var(--text-1)] text-xs tracking-[0.2em] uppercase opacity-80 font-medium">
+                <p className="text-[var(--atum-text-1)] text-xs tracking-[0.2em] uppercase opacity-80 font-medium">
                   Customer Access
                 </p>
               </div>
@@ -92,7 +93,7 @@ export default function PortalLogin() {
               <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">
                 {error && (
                   <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center font-medium flex items-center justify-center gap-2">
-                    ⚠️ {error}
+                    <AlertTriangle size={14} /> {error}
                   </div>
                 )}
 
@@ -108,8 +109,8 @@ export default function PortalLogin() {
                     <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}
                       className="atum-input" style={{ paddingRight: '44px' }} placeholder="••••••••" autoComplete="new-password" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-2)] hover:text-white transition-colors text-sm">
-                      {showPassword ? '🙈' : '👁️'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--atum-text-muted)] hover:text-white transition-colors text-sm">
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
@@ -120,17 +121,17 @@ export default function PortalLogin() {
                 </button>
               </form>
 
-              <div className="mt-8 flex justify-between text-[10px] text-[var(--text-2)] uppercase tracking-wide">
-                <Link to="/desk/login" className="hover:text-[var(--accent-gold)] transition-colors">
+              <div className="mt-8 flex justify-between text-[10px] text-[var(--atum-text-muted)] uppercase tracking-wide">
+                <Link to="/desk/login" className="hover:text-[var(--atum-accent-gold)] transition-colors">
                   ← Staff Desk
                 </Link>
-                <Link to="/" className="hover:text-[var(--accent-gold)] transition-colors">
+                <Link to="/" className="hover:text-[var(--atum-accent-gold)] transition-colors">
                   Home
                 </Link>
               </div>
 
-              <div className="mt-6 text-center border-t border-[var(--glass-border)] pt-4">
-                <span className="text-[10px] text-[var(--text-2)] uppercase tracking-widest">
+              <div className="mt-6 text-center border-t border-[var(--atum-border)] pt-4">
+                <span className="text-[10px] text-[var(--atum-text-muted)] uppercase tracking-widest">
                   ATUM DESK v1.0.0 • Customer Portal
                 </span>
               </div>

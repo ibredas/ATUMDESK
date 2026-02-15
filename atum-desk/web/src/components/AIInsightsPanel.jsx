@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Bot } from 'lucide-react'
 
 export default function AIInsightsPanel() {
     const [insights, setInsights] = useState(null)
@@ -42,7 +43,7 @@ export default function AIInsightsPanel() {
         return (
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
                 <div className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-[var(--accent-gold)] border-t-transparent rounded-full"></div>
+                    <div className="animate-spin h-4 w-4 border-2 border-[var(--atum-accent-gold)] border-t-transparent rounded-full"></div>
                     <span className="text-sm text-[var(--text-muted)]">Loading AI Insights...</span>
                 </div>
             </div>
@@ -53,7 +54,7 @@ export default function AIInsightsPanel() {
         return (
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
                 <div className="flex items-center gap-2 text-[var(--text-muted)]">
-                    <span>🤖</span>
+                    <Bot size={16} />
                     <span className="text-sm">AI Insights unavailable</span>
                 </div>
             </div>
@@ -64,12 +65,12 @@ export default function AIInsightsPanel() {
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <span className="text-lg">🤖</span>
+                    <Bot size={18} />
                     <h3 className="font-semibold">AI Insights</h3>
                 </div>
-                <button 
+                <button
                     onClick={loadInsights}
-                    className="text-xs text-[var(--accent-gold)] hover:underline"
+                    className="text-xs text-[var(--atum-accent-gold)] hover:underline"
                 >
                     Refresh
                 </button>
@@ -78,7 +79,7 @@ export default function AIInsightsPanel() {
             {/* Summary Stats */}
             <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-[var(--bg)] rounded p-3">
-                    <div className="text-2xl font-bold text-[var(--accent-gold)]">{insights.total_tickets}</div>
+                    <div className="text-2xl font-bold text-[var(--atum-accent-gold)]">{insights.total_tickets}</div>
                     <div className="text-xs text-[var(--text-muted)]">Tickets ({insights.period_days}d)</div>
                 </div>
                 <div className="bg-[var(--bg)] rounded p-3">
@@ -91,7 +92,7 @@ export default function AIInsightsPanel() {
             <div className="space-y-2">
                 <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase">Recommendations</h4>
                 {insights.insights && insights.insights.map((insight, idx) => (
-                    <div 
+                    <div
                         key={idx}
                         className={`p-3 rounded border ${getSeverityColor(insight.severity)}`}
                     >

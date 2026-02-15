@@ -1,9 +1,16 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import DeskLayout from './components/Layout/DeskLayout'
 
 // Landing
 import LandingPage from './pages/LandingPage'
+import OverviewPage from './pages/landing/OverviewPage'
+import ComparePage from './pages/landing/ComparePage'
+import SecurityPage from './pages/landing/SecurityPage'
+import AIPage from './pages/landing/AIPage'
+import PricingPage from './pages/landing/PricingPage'
+import DemoPage from './pages/landing/DemoPage'
 
 // Portal (Customer)
 import PortalLogin from './pages/portal/PortalLogin'
@@ -27,6 +34,7 @@ import DeskMonitoring from './pages/desk/DeskMonitoring'
 import DeskPlaybooks from './pages/desk/DeskPlaybooks'
 import DeskAuditLog from './pages/desk/DeskAuditLog'
 import DeskWorkflows from './pages/desk/DeskWorkflows'
+import DeskSLAAlerts from './pages/desk/DeskSLAAlerts'
 import AdminSecurity from './pages/admin/AdminSecurity'
 import AdminDashboard from './pages/desk/AdminDashboard'
 import AdminJobQueue from './pages/desk/admin/AdminJobQueue'
@@ -50,22 +58,36 @@ import AdminPolicyCenter from './pages/admin/AdminPolicyCenter'
 // Portal Pages
 import PortalHelpCenter from './pages/portal/PortalHelpCenter'
 
+// Command Palette
+import CommandPalette from './components/CommandPalette'
+
 function App() {
   return (
     <>
       <Toaster position="top-right" toastOptions={{
         style: {
-          background: '#121212',
+          background: '#0B1020',
           color: '#fff',
           border: '1px solid rgba(212,175,55,0.15)',
           fontSize: '13px',
+          borderRadius: '8px',
         }
       }} />
-      <Routes>
-        {/* Landing */}
-        <Route path="/" element={<LandingPage />} />
 
-        {/* Portal (Customer) */}
+      {/* Command Palette — global Ctrl+K */}
+      <CommandPalette />
+
+      <Routes>
+        {/* ── Landing / Marketing ── */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/overview" element={<OverviewPage />} />
+        <Route path="/compare/legacy-itsm" element={<ComparePage />} />
+        <Route path="/security" element={<SecurityPage />} />
+        <Route path="/ai" element={<AIPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/demo" element={<DemoPage />} />
+
+        {/* ── Portal (Customer) ── */}
         <Route path="/portal" element={<Navigate to="/portal/login" replace />} />
         <Route path="/portal/login" element={<PortalLogin />} />
         <Route path="/portal/tickets" element={<PortalTickets />} />
@@ -73,47 +95,53 @@ function App() {
         <Route path="/portal/tickets/:id" element={<PortalTicketDetail />} />
         <Route path="/portal/help" element={<PortalHelpCenter />} />
 
-        {/* Desk (Staff) */}
+        {/* ── Desk (Staff) - Auth Routes ── */}
         <Route path="/desk" element={<Navigate to="/desk/login" replace />} />
         <Route path="/desk/login" element={<DeskLogin />} />
-        <Route path="/desk/dashboard" element={<DeskDashboard />} />
-        <Route path="/desk/inbox" element={<DeskInbox />} />
-        <Route path="/desk/tickets/:id" element={<DeskTicketDetail />} />
 
-        {/* Desk KB */}
-        <Route path="/desk/kb" element={<DeskKnowledgeBase />} />
-        <Route path="/desk/kb/new" element={<DeskArticleEditor />} />
-        <Route path="/desk/kb/:id" element={<DeskArticleEditor />} />
+        {/* ── Desk (Protected Layout) ── */}
+        <Route element={<DeskLayout />}>
+          <Route path="/desk/dashboard" element={<DeskDashboard />} />
+          <Route path="/desk/inbox" element={<DeskInbox />} />
+          <Route path="/desk/tickets/:id" element={<DeskTicketDetail />} />
 
-        {/* Phase 2 Modules */}
-        <Route path="/desk/problems" element={<DeskProblemList />} />
-        <Route path="/desk/changes" element={<DeskChangeList />} />
-        <Route path="/desk/assets" element={<DeskAssetList />} />
+          {/* KB */}
+          <Route path="/desk/kb" element={<DeskKnowledgeBase />} />
+          <Route path="/desk/kb/new" element={<DeskArticleEditor />} />
+          <Route path="/desk/kb/:id" element={<DeskArticleEditor />} />
 
-        {/* NEW: Operations & Governance */}
-        <Route path="/desk/monitoring" element={<DeskMonitoring />} />
-        <Route path="/desk/workflows" element={<DeskWorkflows />} />
-        <Route path="/desk/playbooks" element={<DeskPlaybooks />} />
-        <Route path="/desk/audit" element={<DeskAuditLog />} />
-        <Route path="/desk/incidents" element={<DeskIncidents />} />
-        <Route path="/desk/postmortems" element={<DeskPostmortems />} />
-        <Route path="/desk/kb-suggestions" element={<DeskKBSuggestions />} />
+          {/* Phase 2 Modules */}
+          <Route path="/desk/problems" element={<DeskProblemList />} />
+          <Route path="/desk/changes" element={<DeskChangeList />} />
+          <Route path="/desk/assets" element={<DeskAssetList />} />
 
-        {/* NEW: Admin */}
-        <Route path="/desk/admin/security" element={<AdminSecurity />} />
-        <Route path="/desk/admin/jobs" element={<AdminJobQueue />} />
-        <Route path="/desk/admin/policies" element={<AdminPolicyCenter />} />
-        <Route path="/desk/admin/ip-restrictions" element={<AdminIPRestrictions />} />
-        <Route path="/desk/admin/ai-control" element={<AdminAIControl />} />
-        <Route path="/desk/admin/forms" element={<AdminFormsStudio />} />
-        <Route path="/desk/admin/org" element={<AdminOrgManagement />} />
-        <Route path="/desk/admin" element={<AdminDashboard />} />
+          {/* Operations & Governance */}
+          <Route path="/desk/monitoring" element={<DeskMonitoring />} />
+          <Route path="/desk/workflows" element={<DeskWorkflows />} />
+          <Route path="/desk/playbooks" element={<DeskPlaybooks />} />
+          <Route path="/desk/audit" element={<DeskAuditLog />} />
+          <Route path="/desk/sla-alerts" element={<DeskSLAAlerts />} />
+          <Route path="/desk/incidents" element={<DeskIncidents />} />
+          <Route path="/desk/postmortems" element={<DeskPostmortems />} />
 
-        {/* AI Intelligence */}
-        <Route path="/desk/ai/analytics" element={<AIAnalyticsHub />} />
-        <Route path="/desk/ai/insights" element={<AISmartInsights />} />
-        <Route path="/desk/ai/agent-assist" element={<AIAgentAssist />} />
-        <Route path="/desk/ai/sla-prediction" element={<AISLAPrediction />} />
+          {/* Admin */}
+          <Route path="/desk/admin/security" element={<AdminSecurity />} />
+          <Route path="/desk/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/desk/admin/queues" element={<AdminJobQueue />} />
+          <Route path="/desk/admin/ip-restrictions" element={<AdminIPRestrictions />} />
+          <Route path="/desk/admin/ai" element={<AdminAIControl />} />
+          <Route path="/desk/admin/forms" element={<AdminFormsStudio />} />
+          <Route path="/desk/admin/org" element={<AdminOrgManagement />} />
+          <Route path="/desk/admin/policies" element={<AdminPolicyCenter />} />
+
+          {/* AI */}
+          <Route path="/desk/ai/analytics" element={<AIAnalyticsHub />} />
+          <Route path="/desk/ai/insights" element={<AISmartInsights />} />
+          <Route path="/desk/ai/assist" element={<AIAgentAssist />} />
+          <Route path="/desk/ai/sla" element={<AISLAPrediction />} />
+
+          <Route path="/desk/kb-suggestions" element={<DeskKBSuggestions />} />
+        </Route>
       </Routes>
     </>
   )

@@ -11,7 +11,7 @@ export function Badge({
   className = '' 
 }) {
   const variants = {
-    default: 'bg-[var(--bg-2)] text-[var(--text-1)] border border-[var(--border)]',
+    default: 'bg-[var(--atum-bg-2)] text-[var(--atum-text-1)] border border-[var(--atum-border)]',
     // Status
     new: 'bg-blue-900/40 text-blue-400 border border-blue-700',
     open: 'bg-amber-900/40 text-amber-400 border border-amber-700',
@@ -30,7 +30,7 @@ export function Badge({
     warning: 'bg-amber-900/40 text-amber-400 border border-amber-700',
     error: 'bg-red-900/40 text-red-400 border border-red-700',
     info: 'bg-blue-900/40 text-blue-400 border border-blue-700',
-    gold: 'bg-[var(--accent-gold-muted)] text-[var(--accent-gold)] border border-[var(--accent-gold)]/30',
+    gold: 'bg-[var(--accent-gold-muted)] text-[var(--atum-accent-gold)] border border-[var(--atum-accent-gold)]/30',
   }
   
   const sizes = {

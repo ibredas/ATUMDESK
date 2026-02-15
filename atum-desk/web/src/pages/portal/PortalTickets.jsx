@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Wordmark } from '../../components/Brand/Wordmark'
+import { Ticket, Plus, LogOut } from 'lucide-react'
 
 export default function PortalTickets() {
   const navigate = useNavigate()
@@ -34,17 +35,17 @@ export default function PortalTickets() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-0)]">
+    <div className="min-h-screen bg-[var(--atum-bg)]">
       <div className="grain-overlay"></div>
       {/* Header */}
-      <nav className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-[var(--glass-border)] backdrop-blur-sm">
+      <nav className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-[var(--atum-border)] backdrop-blur-sm">
         <Wordmark className="h-6 text-[#60a5fa]" suffix="PORTAL" />
         <div className="flex items-center gap-3">
           <Link to="/portal/tickets/new" className="btn-outline" style={{ borderColor: 'rgba(59,130,246,0.3)', color: '#60a5fa' }}>
-            + New Ticket
+            <Plus size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> New Ticket
           </Link>
-          <button onClick={logout} className="text-[10px] uppercase tracking-widest text-[var(--text-2)] hover:text-red-400 transition-colors">
-            Sign Out
+          <button onClick={logout} className="text-[10px] uppercase tracking-widest text-[var(--atum-text-muted)] hover:text-red-400 transition-colors flex items-center gap-1">
+            <LogOut size={12} /> Sign Out
           </button>
         </div>
       </nav>
@@ -56,15 +57,15 @@ export default function PortalTickets() {
           {loading ? (
             <div className="flex items-center justify-center py-16"><div className="spinner"></div></div>
           ) : tickets.length === 0 ? (
-            <div className="text-center py-16 text-[var(--text-2)]">
-              <div className="text-4xl mb-3">🎫</div>
+            <div className="text-center py-16 text-[var(--atum-text-muted)]">
+              <Ticket size={48} className="mx-auto mb-3" />
               <p className="text-sm mb-4">No tickets yet</p>
               <Link to="/portal/tickets/new" className="btn-outline" style={{ borderColor: 'rgba(59,130,246,0.3)', color: '#60a5fa' }}>
                 Submit a Ticket
               </Link>
             </div>
           ) : (
-            <table className="atum-table">
+            <table className="glass-table">
               <thead>
                 <tr><th>Subject</th><th>Status</th><th>Priority</th><th>Updated</th></tr>
               </thead>

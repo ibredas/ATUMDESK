@@ -52,6 +52,9 @@ app = FastAPI(
 )
 
 # CORS middleware - Strict policy for JWT-only auth
+# NOTE: CSRF protection is NOT needed for JWT authentication
+# JWT tokens are sent in Authorization header, not cookies
+# CSRF attacks only affect cookie-based authentication
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.FRONTEND_URL] if settings.FRONTEND_URL else [],
@@ -163,7 +166,7 @@ from app.routers import rag
 app.include_router(rag.router, prefix="/api/v1/rag", tags=["RAG"])
 
 from app.routers import copilot
-app.include_router(copilot.router, prefix="/api/v1/internal/tickets", tags=["Copilot"])
+app.include_router(copilot.router, prefix="/api/v1/copilot", tags=["Copilot"])
 
 from app.routers import assistant
 app.include_router(assistant.router, prefix="/api/v1/internal", tags=["Assistant"])

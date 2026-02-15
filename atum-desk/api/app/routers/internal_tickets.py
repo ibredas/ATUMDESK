@@ -37,6 +37,47 @@ class InternalTicketResponse(BaseModel):
     updated_at: datetime
 
 
+@router.get("/", response_model=List[InternalTicketResponse])
+async def list_all_tickets(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session)
+):
+    """List all tickets for internal staff (agent/manager/admin)"""
+    if current_user.role not in [UserRole.AGENT, UserRole.MANAGER, UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    
+    # Base query
+    query = (
+        select(Ticket, User.email)
+        .join(User, Ticket.requester_id == User.id)
+        .where(Ticket.organization_id == current_user.organization_id)
+        .order_by(desc(Ticket.created_at))
+    )
+    
+    # If agent, maybe restrict? Spec says agents see all org tickets or assigned?
+    # Usually Helpdesk agents see all unassigned + assigned to them.
+    # But for now, let's allow seeing full org tickets for "Inbox" view, 
+    # matching the frontend client-side filtering approach.
+    
+    result = await db.execute(query)
+    
+    tickets = []
+    for ticket, requester_email in result.all():
+        tickets.append(InternalTicketResponse(
+            id=str(ticket.id),
+            subject=ticket.subject,
+            description=ticket.description[:200] + "..." if ticket.description and len(ticket.description) > 200 else (ticket.description or ""),
+            status=ticket.status.value,
+            priority=ticket.priority.value,
+            requester_email=requester_email,
+            assigned_to=str(ticket.assigned_to) if ticket.assigned_to else None,
+            created_at=ticket.created_at,
+            updated_at=ticket.updated_at
+        ))
+    
+    return tickets
+
+
 @router.get("/new", response_model=List[InternalTicketResponse])
 async def list_new_tickets(
     current_user: User = Depends(get_current_user),

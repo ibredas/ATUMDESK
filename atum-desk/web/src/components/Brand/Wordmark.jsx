@@ -8,7 +8,7 @@ export function Wordmark({ className = "h-6", color = "currentColor", suffix = "
                     {/* Λ (The Glyph) */}
                     <path d="M4 28L14 4H18L8 28H4Z" />
                     <path d="M26 28L16 4H20L30 28H26Z" />
-                    <circle cx="17" cy="12" r="2.5" style={{ color: 'var(--accent-gold, #d4af37)' }} fill="currentColor" fillOpacity="0.9" />
+                    <circle cx="17" cy="12" r="2.5" style={{ color: 'var(--atum-accent-gold, #d4af37)' }} fill="currentColor" fillOpacity="0.9" />
                     {/* T */}
                     <path d="M42 4H62V8H54V28H50V8H42V4Z" />
                     {/* U */}
@@ -23,8 +23,8 @@ export function Wordmark({ className = "h-6", color = "currentColor", suffix = "
                     fontWeight: 800,
                     letterSpacing: '0.15em',
                     textTransform: 'uppercase',
-                    color: 'var(--text-2, #71717a)',
-                    borderLeft: '1px solid var(--glass-border, rgba(212,175,55,0.15))',
+                    color: 'var(--atum-text-muted, #71717a)',
+                    borderLeft: '1px solid var(--atum-border, rgba(212,175,55,0.15))',
                     paddingLeft: '8px',
                     lineHeight: 1,
                 }}>

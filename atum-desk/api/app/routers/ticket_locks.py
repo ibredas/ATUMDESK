@@ -98,10 +98,12 @@ async def get_ticket_lock(
                    u.id as user_id, u.full_name as user_name
             FROM ticket_locks tl
             JOIN users u ON u.id = tl.user_id
+            JOIN tickets t ON t.id = tl.ticket_id
             WHERE tl.ticket_id = :ticket_id 
             AND tl.expires_at > NOW()
+            AND t.organization_id = (SELECT organization_id FROM users WHERE id = :current_user_id)
         """),
-        {"ticket_id": ticket_id}
+        {"ticket_id": ticket_id, "current_user_id": str(current_user.id)}
     )
     row = result.fetchone()
     

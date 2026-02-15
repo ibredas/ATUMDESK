@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { PageShell, GlassCard } from '../../components/Premium'
+import { FileText, ClipboardList } from 'lucide-react'
 
 const API = '/api/v1/incidents'
 
@@ -13,7 +15,6 @@ export default function DeskPostmortems() {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true)
-            // Fetch resolved/closed incidents that have postmortems
             const res = await fetch(`${API}?status=RESOLVED&limit=50`, { headers })
             if (!res.ok) throw new Error(`HTTP ${res.status}`)
             const data = await res.json()
@@ -29,65 +30,44 @@ export default function DeskPostmortems() {
     useEffect(() => { fetchData() }, [fetchData])
 
     return (
-        <div className="desk-page">
-            <div className="desk-page-header">
-                <h1>📋 Postmortems</h1>
-                <p style={{ color: 'var(--text-2)' }}>Root cause analysis & lessons learned from resolved incidents</p>
-            </div>
-
+        <PageShell title="Postmortems" icon={ClipboardList} subtitle="Root cause analysis & lessons learned from resolved incidents">
             {error && (
-                <div style={{ padding: '12px 16px', background: '#ef444420', border: '1px solid #ef4444', borderRadius: '8px', marginBottom: '16px', color: '#ef4444' }}>
-                    {error}
-                </div>
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-4">{error}</div>
             )}
 
-            <div className="glass-panel" style={{ borderRadius: '12px', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
+            <GlassCard>
                 {loading ? (
-                    <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-2)' }}>Loading postmortems...</div>
+                    <div className="p-10 text-center text-[var(--atum-text-muted)]">Loading postmortems...</div>
                 ) : postmortems.length === 0 ? (
-                    <div style={{ padding: '40px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '12px' }}>📋</div>
-                        <h3>No Postmortems Yet</h3>
-                        <p style={{ color: 'var(--text-2)' }}>Postmortems will appear here after incidents are resolved</p>
+                    <div className="p-10 text-center">
+                        <FileText size={48} className="mx-auto mb-3 text-[var(--atum-text-muted)]" />
+                        <h3 className="font-semibold">No Postmortems Yet</h3>
+                        <p className="text-[var(--atum-text-muted)]">Postmortems will appear here after incidents are resolved</p>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px' }}>
+                    <div className="flex flex-col gap-3">
                         {postmortems.map(pm => (
-                            <div
-                                key={pm.id}
-                                style={{
-                                    padding: '16px 20px', borderRadius: '10px',
-                                    border: '1px solid var(--glass-border, #333)',
-                                    background: 'var(--bg-2, #1a1a2e)',
-                                }}
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                    <h3 style={{ margin: 0, fontSize: '1rem' }}>{pm.title}</h3>
-                                    <span style={{
-                                        padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700,
+                            <div key={pm.id} className="p-4 rounded-lg border border-[var(--atum-border)] bg-[var(--atum-surface-2)]">
+                                <div className="flex justify-between items-center mb-2">
+                                    <h3 className="font-semibold">{pm.title}</h3>
+                                    <span className="badge" style={{
                                         background: pm.severity === 'SEV1' ? '#ef444420' : pm.severity === 'SEV2' ? '#f59e0b20' : '#3b82f620',
                                         color: pm.severity === 'SEV1' ? '#ef4444' : pm.severity === 'SEV2' ? '#f59e0b' : '#3b82f6',
-                                    }}>
-                                        {pm.severity}
-                                    </span>
+                                    }}>{pm.severity}</span>
                                 </div>
                                 {pm.customer_impact_summary && (
-                                    <p style={{ color: 'var(--text-2)', fontSize: '0.9rem', margin: '4px 0 8px' }}>
-                                        {pm.customer_impact_summary}
-                                    </p>
+                                    <p className="text-[var(--atum-text-muted)] text-sm mb-2">{pm.customer_impact_summary}</p>
                                 )}
-                                <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: 'var(--text-2)' }}>
+                                <div className="flex gap-4 text-xs text-[var(--atum-text-muted)]">
                                     <span>Started: {pm.start_at ? new Date(pm.start_at).toLocaleDateString() : '—'}</span>
                                     <span>Resolved: {pm.resolved_at ? new Date(pm.resolved_at).toLocaleDateString() : '—'}</span>
-                                    <span style={{ padding: '2px 8px', borderRadius: '4px', background: '#22c55e20', color: '#22c55e' }}>
-                                        {pm.status}
-                                    </span>
+                                    <span className="badge badge-new">{pm.status}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
-        </div>
+            </GlassCard>
+        </PageShell>
     )
 }

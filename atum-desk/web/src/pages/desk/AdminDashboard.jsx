@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import DeskSidebar from '../../components/DeskSidebar'
+import { PageShell, GlassCard } from '../../components/Premium'
+import { Settings, Shield, Bot, Zap, Server, Activity, Users, Ticket, Database, BarChart3, BookOpen, Clock, FileText, Wrench } from 'lucide-react'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -25,351 +26,321 @@ export default function AdminDashboard() {
   }
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '🎯' },
-    { id: 'system', label: 'System Control', icon: '⚙️' },
-    { id: 'security', label: 'Security', icon: '🔒' },
-    { id: 'ai', label: 'AI & RAG', icon: '🤖' },
-    { id: 'automation', label: 'Automation', icon: '⚡' },
-    { id: 'services', label: 'Services', icon: '🛠️' },
+    { id: 'overview', label: 'Overview', icon: Activity },
+    { id: 'system', label: 'System Control', icon: Settings },
+    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'ai', label: 'AI & RAG', icon: Bot },
+    { id: 'automation', label: 'Automation', icon: Zap },
+    { id: 'services', label: 'Services', icon: Wrench },
   ]
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-[var(--bg-0)]">
-        <DeskSidebar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin h-8 w-8 border-2 border-[var(--accent-gold)] border-t-transparent rounded-full"></div>
+      <PageShell title="Admin Dashboard" subtitle="Loading...">
+        <div className="flex items-center justify-center py-24">
+          <div className="w-8 h-8 border-2 border-[var(--atum-accent-gold)] border-t-transparent rounded-full animate-spin"></div>
         </div>
-      </div>
+      </PageShell>
     )
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-0)]">
-      <DeskSidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-8xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-3">
-                <span className="text-3xl">🎛️</span>
-                Admin Dashboard
-              </h1>
-              <p className="text-[var(--text-muted)] mt-1">Complete platform control center</p>
-            </div>
-            <span className="text-[10px] uppercase tracking-widest text-[var(--text-2)]">ATUM DESK v1.0.0</span>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
-                  activeTab === tab.id 
-                    ? 'bg-[var(--accent-gold)] text-black' 
-                    : 'bg-[var(--bg-2)] text-[var(--text-1)] border border-[var(--border)] hover:border-[var(--accent-gold)]'
+    <PageShell
+      title="Admin Dashboard"
+      subtitle="Complete platform control center"
+      actions={
+        <span className="text-[10px] uppercase tracking-widest text-[var(--atum-text-muted)]">ATUM DESK v1.0.0</span>
+      }
+    >
+      {/* Tabs */}
+      <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+        {tabs.map(tab => {
+          const Icon = tab.icon
+          return (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${activeTab === tab.id
+                  ? 'bg-[var(--atum-accent-gold)] text-black'
+                  : 'bg-[var(--atum-surface)] text-[var(--atum-text-muted)] border border-[var(--atum-border)] hover:border-[var(--atum-accent-gold)]'
                 }`}
-              >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
+            >
+              <Icon size={14} /> {tab.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Overview Tab */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <GlassCard>
+              <div className="flex items-center gap-3 mb-3 p-4">
+                <Activity size={20} className="text-green-400" />
+                <span className="text-sm text-[var(--atum-text-muted)] uppercase">API Status</span>
+              </div>
+              <div className="text-2xl font-bold text-green-400 px-4 pb-4">{systemHealth?.status || 'HEALTHY'}</div>
+            </GlassCard>
+            <GlassCard>
+              <div className="flex items-center gap-3 mb-3 p-4">
+                <Database size={20} className="text-green-400" />
+                <span className="text-sm text-[var(--atum-text-muted)] uppercase">Database</span>
+              </div>
+              <div className="text-2xl font-bold text-green-400 px-4 pb-4">{systemHealth?.components?.database?.status?.toUpperCase() || 'CONNECTED'}</div>
+            </GlassCard>
+            <GlassCard>
+              <div className="flex items-center gap-3 mb-3 p-4">
+                <Users size={20} className="text-[var(--atum-accent-gold)]" />
+                <span className="text-sm text-[var(--atum-text-muted)] uppercase">Active Users</span>
+              </div>
+              <div className="text-2xl font-bold text-[var(--atum-accent-gold)] px-4 pb-4">12</div>
+            </GlassCard>
+            <GlassCard>
+              <div className="flex items-center gap-3 mb-3 p-4">
+                <Ticket size={20} className="text-blue-400" />
+                <span className="text-sm text-[var(--atum-text-muted)] uppercase">Open Tickets</span>
+              </div>
+              <div className="text-2xl font-bold text-blue-400 px-4 pb-4">8</div>
+            </GlassCard>
           </div>
 
-          {/* Overview Tab */}
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
-              {/* Quick Stats */}
+          {/* Quick Links */}
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">Quick Access</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="glass-panel rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-2xl">🟢</span>
-                    <span className="text-sm text-[var(--text-muted)] uppercase">API Status</span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-400">{systemHealth?.status || 'HEALTHY'}</div>
-                </div>
-                
-                <div className="glass-panel rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-2xl">📊</span>
-                    <span className="text-sm text-[var(--text-muted)] uppercase">Database</span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-400">{systemHealth?.components?.database?.status?.toUpperCase() || 'CONNECTED'}</div>
-                </div>
-
-                <div className="glass-panel rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-2xl">👥</span>
-                    <span className="text-sm text-[var(--text-muted)] uppercase">Active Users</span>
-                  </div>
-                  <div className="text-2xl font-bold text-[var(--accent-gold)]">12</div>
-                </div>
-
-                <div className="glass-panel rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-2xl">🎫</span>
-                    <span className="text-sm text-[var(--text-muted)] uppercase">Open Tickets</span>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-400">8</div>
-                </div>
-              </div>
-
-              {/* Quick Links */}
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Quick Access</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Link to="/desk/audit" className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition group">
-                    <div className="text-2xl mb-2 group-hover:scale-110 transition">📝</div>
-                    <div className="font-medium">Audit Logs</div>
-                    <div className="text-xs text-[var(--text-muted)]">View all activity</div>
+                {[
+                  { to: '/desk/audit', icon: FileText, label: 'Audit Logs', desc: 'View all activity' },
+                  { to: '/desk/workflows', icon: Zap, label: 'Workflows', desc: 'Automation rules' },
+                  { to: '/desk/ai/analytics', icon: Bot, label: 'AI Control', desc: 'Configure AI features' },
+                  { to: '/desk/admin/security', icon: Shield, label: 'Security', desc: '2FA & policies' },
+                ].map(link => (
+                  <Link key={link.to} to={link.to}
+                    className="p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)] hover:border-[var(--atum-accent-gold)] transition group">
+                    <link.icon size={24} className="mb-2 text-[var(--atum-text-muted)] group-hover:text-[var(--atum-accent-gold)] transition group-hover:scale-110" />
+                    <div className="font-medium">{link.label}</div>
+                    <div className="text-xs text-[var(--atum-text-muted)]">{link.desc}</div>
                   </Link>
-                  <Link to="/desk/workflows" className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition group">
-                    <div className="text-2xl mb-2 group-hover:scale-110 transition">⚡</div>
-                    <div className="font-medium">Workflows</div>
-                    <div className="text-xs text-[var(--text-muted)]">Automation rules</div>
-                  </Link>
-                  <Link to="/desk/ai/analytics" className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition group">
-                    <div className="text-2xl mb-2 group-hover:scale-110 transition">🤖</div>
-                    <div className="font-medium">AI Control</div>
-                    <div className="text-xs text-[var(--text-muted)]">Configure AI features</div>
-                  </Link>
-                  <Link to="/desk/admin/security" className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition group">
-                    <div className="text-2xl mb-2 group-hover:scale-110 transition">🔐</div>
-                    <div className="font-medium">Security</div>
-                    <div className="text-xs text-[var(--text-muted)]">2FA & policies</div>
-                  </Link>
-                </div>
-              </div>
-
-              {/* System Services */}
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">System Services</h2>
-                <div className="space-y-3">
-                  {[
-                    { name: 'API Server', status: 'running', pid: '823558', icon: '🚀' },
-                    { name: 'SLA Worker', status: 'running', pid: '823860', icon: '⏰' },
-                    { name: 'RAG Worker', status: 'running', pid: '324772', icon: '🧠' },
-                    { name: 'Job Worker', status: 'running', pid: '501596', icon: '📋' },
-                  ].map(service => (
-                    <div key={service.name} className="flex items-center justify-between p-3 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">{service.icon}</span>
-                        <div>
-                          <div className="font-medium">{service.name}</div>
-                          <div className="text-xs text-[var(--text-muted)]">PID: {service.pid}</div>
-                        </div>
-                      </div>
-                      <span className="px-2 py-1 rounded text-xs bg-green-900/40 text-green-400 border border-green-700">
-                        ● {service.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
-          )}
+          </GlassCard>
 
-          {/* System Control Tab */}
-          {activeTab === 'system' && (
-            <div className="space-y-6">
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Service Management</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <h3 className="font-medium mb-2">🚀 API Server</h3>
-                    <div className="text-sm text-[var(--text-muted)]">Port: 8000 | Workers: 4</div>
-                    <div className="mt-3 flex gap-2">
-                      <button className="px-3 py-1 text-xs bg-[var(--accent-gold)] text-black rounded font-medium">Restart</button>
-                      <button className="px-3 py-1 text-xs bg-[var(--bg-2)] text-[var(--text-1)] rounded border border-[var(--border)]">Logs</button>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <h3 className="font-medium mb-2">⏰ SLA Worker</h3>
-                    <div className="text-sm text-[var(--text-muted)]">Interval: 60s | Processing: 3 tickets</div>
-                    <div className="mt-3 flex gap-2">
-                      <button className="px-3 py-1 text-xs bg-[var(--accent-gold)] text-black rounded font-medium">Restart</button>
-                      <button className="px-3 py-1 text-xs bg-[var(--bg-2)] text-[var(--text-1)] rounded border border-[var(--border)]">Logs</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Job Queue Status</h2>
-                <div className="space-y-2">
-                  {[
-                    { type: 'TRIAGE_TICKET', pending: 0, running: 0 },
-                    { type: 'KB_SUGGEST', pending: 0, running: 0 },
-                    { type: 'SMART_REPLY', pending: 0, running: 0 },
-                    { type: 'SLA_PREDICT', pending: 0, running: 0 },
-                  ].map(job => (
-                    <div key={job.type} className="flex items-center justify-between p-3 bg-[var(--bg)] rounded-lg">
-                      <span className="font-mono text-sm">{job.type}</span>
-                      <div className="flex gap-4 text-sm">
-                        <span className="text-orange-400">Pending: {job.pending}</span>
-                        <span className="text-blue-400">Running: {job.running}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Security Tab */}
-          {activeTab === 'security' && (
-            <div className="space-y-6">
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Security Settings</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div>
-                      <div className="font-medium">Two-Factor Authentication (2FA)</div>
-                      <div className="text-sm text-[var(--text-muted)]">Enforce 2FA for all admin users</div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-[var(--bg-2)] rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div>
-                      <div className="font-medium">IP Restrictions</div>
-                      <div className="text-sm text-[var(--text-muted)]">Restrict admin access by IP</div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-[var(--bg-2)] rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div>
-                      <div className="font-medium">Password Policy</div>
-                      <div className="text-sm text-[var(--text-muted)]">Min 8 chars, complexity required</div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-[var(--bg-2)] rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* AI Tab */}
-          {activeTab === 'ai' && (
-            <div className="space-y-6">
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">AI Feature Flags</h2>
-                <div className="space-y-4">
-                  {[
-                    { name: 'AI Auto-Triage', key: 'auto_triage', enabled: true },
-                    { name: 'AI Auto-Assign', key: 'auto_assign', enabled: true },
-                    { name: 'Sentiment Analysis', key: 'sentiment_analysis', enabled: true },
-                    { name: 'Smart Reply', key: 'smarter_reply', enabled: true },
-                    { name: 'SLA Prediction', key: 'sla_prediction', enabled: true },
-                    { name: 'KB Suggestions', key: 'kb_suggestions', enabled: true },
-                  ].map(flag => (
-                    <div key={flag.key} className="flex items-center justify-between p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
+          {/* System Services */}
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">System Services</h2>
+              <div className="space-y-3">
+                {[
+                  { name: 'API Server', status: 'running', pid: '823558', icon: Server },
+                  { name: 'SLA Worker', status: 'running', pid: '823860', icon: Clock },
+                  { name: 'RAG Worker', status: 'running', pid: '324772', icon: Bot },
+                  { name: 'Job Worker', status: 'running', pid: '501596', icon: BarChart3 },
+                ].map(service => (
+                  <div key={service.name} className="flex items-center justify-between p-3 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)]">
+                    <div className="flex items-center gap-3">
+                      <service.icon size={20} className="text-[var(--atum-text-muted)]" />
                       <div>
-                        <div className="font-medium">{flag.name}</div>
+                        <div className="font-medium">{service.name}</div>
+                        <div className="text-xs text-[var(--atum-text-muted)]">PID: {service.pid}</div>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked={flag.enabled} />
-                        <div className="w-11 h-6 bg-[var(--bg-2)] rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                      </label>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">RAG Configuration</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div className="text-sm text-[var(--text-muted)] mb-1">Embedding Model</div>
-                    <div className="font-mono text-sm">nomic-embed-text</div>
+                    <span className="px-2 py-1 rounded text-xs bg-green-900/40 text-green-400 border border-green-700">
+                      ● {service.status}
+                    </span>
                   </div>
-                  <div className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div className="text-sm text-[var(--text-muted)] mb-1">Vector Dimensions</div>
-                    <div className="font-mono text-sm">768</div>
-                  </div>
-                  <div className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div className="text-sm text-[var(--text-muted)] mb-1">Indexed Documents</div>
-                    <div className="font-mono text-sm">142</div>
-                  </div>
-                  <div className="p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                    <div className="text-sm text-[var(--text-muted)] mb-1">Index Status</div>
-                    <div className="font-mono text-sm text-green-400">● HEALTHY</div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-          )}
-
-          {/* Automation Tab */}
-          {activeTab === 'automation' && (
-            <div className="space-y-6">
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Workflow Engine</h2>
-                <div className="space-y-3">
-                  <Link to="/desk/workflows" className="block p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition">
-                    <div className="font-medium">⚡ Workflow Builder</div>
-                    <div className="text-sm text-[var(--text-muted)]">Create and manage automation rules</div>
-                  </Link>
-                  <Link to="/desk/rules" className="block p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition">
-                    <div className="font-medium">📋 Rules Engine</div>
-                    <div className="text-sm text-[var(--text-muted)]">View active rules and triggers</div>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Playbooks</h2>
-                <div className="space-y-3">
-                  <Link to="/desk/playbooks" className="block p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition">
-                    <div className="font-medium">📚 Operational Playbooks</div>
-                    <div className="text-sm text-[var(--text-muted)]">Incident response templates</div>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Services Tab */}
-          {activeTab === 'services' && (
-            <div className="space-y-6">
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">Service Catalog</h2>
-                <div className="space-y-3">
-                  <Link to="/desk/admin/services" className="block p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition">
-                    <div className="font-medium">🛠️ Service Catalog</div>
-                    <div className="text-sm text-[var(--text-muted)]">Manage services and intake forms</div>
-                  </Link>
-                  <Link to="/desk/kb" className="block p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)] hover:border-[var(--accent-gold)] transition">
-                    <div className="font-medium">📚 Knowledge Base</div>
-                    <div className="text-sm text-[var(--text-muted)]">KB articles and categories</div>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="glass-panel rounded-xl p-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-2)] mb-4">SLA Policies</h2>
-                <div className="text-center py-8 text-[var(--text-muted)]">
-                  <div className="text-3xl mb-2">⏰</div>
-                  <p>Configure SLA policies per service</p>
-                </div>
-              </div>
-            </div>
-          )}
+          </GlassCard>
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* System Control Tab */}
+      {activeTab === 'system' && (
+        <div className="space-y-6">
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">Service Management</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { icon: Server, name: 'API Server', info: 'Port: 8000 | Workers: 4' },
+                  { icon: Clock, name: 'SLA Worker', info: 'Interval: 60s | Processing: 3 tickets' },
+                ].map(s => (
+                  <div key={s.name} className="p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)]">
+                    <h3 className="font-medium mb-2 flex items-center gap-2"><s.icon size={16} /> {s.name}</h3>
+                    <div className="text-sm text-[var(--atum-text-muted)]">{s.info}</div>
+                    <div className="mt-3 flex gap-2">
+                      <button className="btn-gold text-xs py-1 px-3">Restart</button>
+                      <button className="btn-outline text-xs py-1 px-3">Logs</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">Job Queue Status</h2>
+              <div className="space-y-2">
+                {[
+                  { type: 'TRIAGE_TICKET', pending: 0, running: 0 },
+                  { type: 'KB_SUGGEST', pending: 0, running: 0 },
+                  { type: 'SMART_REPLY', pending: 0, running: 0 },
+                  { type: 'SLA_PREDICT', pending: 0, running: 0 },
+                ].map(job => (
+                  <div key={job.type} className="flex items-center justify-between p-3 bg-[var(--atum-bg)] rounded-lg">
+                    <span className="font-mono text-sm">{job.type}</span>
+                    <div className="flex gap-4 text-sm">
+                      <span className="text-orange-400">Pending: {job.pending}</span>
+                      <span className="text-blue-400">Running: {job.running}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Security Tab */}
+      {activeTab === 'security' && (
+        <div className="space-y-6">
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">Security Settings</h2>
+              <div className="space-y-4">
+                {[
+                  { label: 'Two-Factor Authentication (2FA)', desc: 'Enforce 2FA for all admin users', on: true },
+                  { label: 'IP Restrictions', desc: 'Restrict admin access by IP', on: false },
+                  { label: 'Password Policy', desc: 'Min 8 chars, complexity required', on: true },
+                ].map(setting => (
+                  <div key={setting.label} className="flex items-center justify-between p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)]">
+                    <div>
+                      <div className="font-medium">{setting.label}</div>
+                      <div className="text-sm text-[var(--atum-text-muted)]">{setting.desc}</div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" defaultChecked={setting.on} />
+                      <div className="w-11 h-6 bg-[var(--atum-bg-2)] rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* AI Tab */}
+      {activeTab === 'ai' && (
+        <div className="space-y-6">
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">AI Feature Flags</h2>
+              <div className="space-y-4">
+                {[
+                  { name: 'AI Auto-Triage', key: 'auto_triage', enabled: true },
+                  { name: 'AI Auto-Assign', key: 'auto_assign', enabled: true },
+                  { name: 'Sentiment Analysis', key: 'sentiment_analysis', enabled: true },
+                  { name: 'Smart Reply', key: 'smarter_reply', enabled: true },
+                  { name: 'SLA Prediction', key: 'sla_prediction', enabled: true },
+                  { name: 'KB Suggestions', key: 'kb_suggestions', enabled: true },
+                ].map(flag => (
+                  <div key={flag.key} className="flex items-center justify-between p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)]">
+                    <div className="font-medium">{flag.name}</div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" defaultChecked={flag.enabled} />
+                      <div className="w-11 h-6 bg-[var(--atum-bg-2)] rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">RAG Configuration</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Embedding Model', value: 'nomic-embed-text' },
+                  { label: 'Vector Dimensions', value: '768' },
+                  { label: 'Indexed Documents', value: '142' },
+                  { label: 'Index Status', value: '● HEALTHY', color: 'text-green-400' },
+                ].map(item => (
+                  <div key={item.label} className="p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)]">
+                    <div className="text-sm text-[var(--atum-text-muted)] mb-1">{item.label}</div>
+                    <div className={`font-mono text-sm ${item.color || ''}`}>{item.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Automation Tab */}
+      {activeTab === 'automation' && (
+        <div className="space-y-6">
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">Workflow Engine</h2>
+              <div className="space-y-3">
+                {[
+                  { to: '/desk/workflows', icon: Zap, label: 'Workflow Builder', desc: 'Create and manage automation rules' },
+                  { to: '/desk/playbooks', icon: BookOpen, label: 'Operational Playbooks', desc: 'Incident response templates' },
+                ].map(link => (
+                  <Link key={link.to} to={link.to}
+                    className="flex items-center gap-3 p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)] hover:border-[var(--atum-accent-gold)] transition">
+                    <link.icon size={20} className="text-[var(--atum-text-muted)]" />
+                    <div>
+                      <div className="font-medium">{link.label}</div>
+                      <div className="text-sm text-[var(--atum-text-muted)]">{link.desc}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Services Tab */}
+      {activeTab === 'services' && (
+        <div className="space-y-6">
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">Service Catalog</h2>
+              <div className="space-y-3">
+                {[
+                  { to: '/desk/admin/services', icon: Wrench, label: 'Service Catalog', desc: 'Manage services and intake forms' },
+                  { to: '/desk/kb', icon: BookOpen, label: 'Knowledge Base', desc: 'KB articles and categories' },
+                ].map(link => (
+                  <Link key={link.to} to={link.to}
+                    className="flex items-center gap-3 p-4 bg-[var(--atum-bg)] rounded-lg border border-[var(--atum-border)] hover:border-[var(--atum-accent-gold)] transition">
+                    <link.icon size={20} className="text-[var(--atum-text-muted)]" />
+                    <div>
+                      <div className="font-medium">{link.label}</div>
+                      <div className="text-sm text-[var(--atum-text-muted)]">{link.desc}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <div className="p-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] mb-4">SLA Policies</h2>
+              <div className="text-center py-8 text-[var(--atum-text-muted)]">
+                <Clock size={32} className="mx-auto mb-2 opacity-20" />
+                <p className="text-sm">Configure SLA policies per service</p>
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+    </PageShell>
   )
 }

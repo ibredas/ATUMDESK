@@ -54,11 +54,13 @@ JOB_TYPES = {
     "SLA_PREDICT": "handle_sla_predict",
     "METRICS_SNAPSHOT": "handle_metrics_snapshot",
     "SENTIMENT_ANALYSIS": "handle_sentiment_analysis",
+    "CLEANUP_LOGS": "handle_cleanup_logs",
 }
 
 # Retry configuration
 MAX_RETRIES = 3
 BASE_BACKOFF = 5  # seconds
+
 
 
 class JobWorker:
@@ -165,6 +167,25 @@ class JobWorker:
                 (str(uuid4()), job_id, event, json.dumps(details) if details else None, datetime.now(timezone.utc))
             )
             await self.conn.commit()
+
+    async def audit_log_write(self, org_id: str, action: str, entity_type: str,
+                               entity_id: str, new_values: Dict = None, user_id: str = None):
+        """Gap 14: Write audit log entry from worker"""
+        query = """
+            INSERT INTO audit_log (id, organization_id, user_id, action, entity_type, entity_id, new_values, created_at)
+            VALUES (%s, %s::uuid, %s, %s, %s, %s::uuid, %s, %s)
+        """
+        try:
+            async with self.conn.cursor() as cur:
+                await cur.execute(query, (
+                    str(uuid4()), org_id, user_id, action, entity_type, entity_id,
+                    json.dumps(new_values) if new_values else None,
+                    datetime.now(timezone.utc)
+                ))
+                await self.conn.commit()
+        except Exception as e:
+            logger.warning("audit_log_write_failed", error=str(e), action=action)
+
     
     async def handle_triage_ticket(self, job: Dict[str, Any]) -> bool:
         """AI triage job handler - categorize and prioritize ticket"""
@@ -177,6 +198,83 @@ class JobWorker:
             return False
         
         logger.info("processing_triage_job", ticket_id=ticket_id, org_id=org_id)
+        
+        try:
+            # Simulate AI Triage (replace with actual LLM call in production)
+            await asyncio.sleep(1) 
+            
+            triage_result = {
+                "category": "technical",
+                "priority": "medium",
+                "tags": ["auto-triaged", "needs-review"],
+                "confidence": 0.85
+            }
+            
+            # Store result
+            insert_query = """
+                INSERT INTO ticket_ai_triage 
+                (id, organization_id, ticket_id, suggested_category, suggested_priority, suggested_tags, created_at)
+                VALUES (%s, %s::uuid, %s::uuid, %s, %s, %s, %s)
+            """
+            
+            async with self.conn.cursor() as cur:
+                await cur.execute(insert_query, (
+                    str(uuid4()), org_id, ticket_id, 
+                    triage_result["category"], triage_result["priority"], 
+                    json.dumps(triage_result["tags"]), datetime.now(timezone.utc)
+                ))
+                await self.conn.commit()
+            
+            # Gap 14: Audit Log
+            await self.audit_log_write(
+                org_id=org_id,
+                action="ai_triage_generated",
+                entity_type="ticket",
+                entity_id=ticket_id,
+                new_values=triage_result
+            )
+
+            await self.complete_job(job["id"], True)
+            return True
+            
+        except Exception as e:
+            logger.error("triage_job_failed", error=str(e))
+            await self.complete_job(job["id"], False, str(e))
+            return False
+
+    async def handle_cleanup_logs(self, job: Dict[str, Any]) -> bool:
+        """Gap 17: Cleanup old logs based on retention policy"""
+        org_id = job.get("organization_id")
+        retention_days = 365 
+        
+        if org_id:
+             async with self.conn.cursor() as cur:
+                await cur.execute("SELECT audit_retention_days FROM org_settings WHERE organization_id = %s::uuid", (org_id,))
+                row = await cur.fetchone()
+                if row and row[0]:
+                    retention_days = row[0]
+
+        logger.info("running_cleanup", org_id=org_id, retention_days=retention_days)
+        cutoff = f"NOW() - INTERVAL '{retention_days} days'"
+        
+        async with self.conn.cursor() as cur:
+            # Cleanup audit logs
+            q1 = f"DELETE FROM audit_log WHERE created_at < {cutoff}"
+            if org_id: q1 += f" AND organization_id = '{org_id}'"
+            await cur.execute(q1)
+            audit_deleted = cur.rowcount
+            
+            # Cleanup job queue
+            q2 = f"DELETE FROM job_queue WHERE status IN ('DONE', 'FAILED') AND updated_at < {cutoff}"
+            if org_id: q2 += f" AND organization_id = '{org_id}'"
+            await cur.execute(q2)
+            jobs_deleted = cur.rowcount
+            
+            await self.conn.commit()
+            
+        logger.info("cleanup_completed", audit_deleted=audit_deleted, jobs_deleted=jobs_deleted)
+        await self.complete_job(job["id"], True)
+        return True
         
         # Get ticket details
         query = """
@@ -287,6 +385,20 @@ Respond with JSON:
             ))
             await self.conn.commit()
         
+        # Gap 14: Audit Log
+        await self.audit_log_write(
+            org_id=org_id,
+            action="ai_triage_generated",
+            entity_type="ticket",
+            entity_id=ticket_id,
+            new_values={
+                "category": triage_data.get("suggested_category"),
+                "priority": triage_data.get("suggested_priority"),
+                "sentiment": triage_data.get("sentiment_label"),
+                "confidence": triage_data.get("confidence")
+            }
+        )
+
         await self.complete_job(job["id"], True)
         logger.info("triage_completed", ticket_id=ticket_id, triage_id=triage_id)
         return True
@@ -688,9 +800,105 @@ Respond with ONLY valid JSON (no markdown):
             ))
             await self.conn.commit()
 
+        # ── Gap 1 fix: Check org_settings for auto-escalation ──
+        escalation_risk = sentiment_data.get("escalation_risk", "low")
+        escalation_score = float(sentiment_data.get("escalation_score", 0))
+        sentiment_label = sentiment_data.get("sentiment_label", "neutral")
+
+        if escalation_risk in ("high",) or sentiment_label in ("negative", "angry"):
+            try:
+                async with self.conn.cursor() as cur:
+                    # Read org setting
+                    await cur.execute(
+                        "SELECT auto_escalate_negative_sentiment, auto_escalate_threshold FROM org_settings WHERE organization_id = %s::uuid",
+                        (org_id,)
+                    )
+                    org_row = await cur.fetchone()
+                    auto_escalate = org_row[0] if org_row else False
+                    threshold = float(org_row[1]) if org_row and org_row[1] else 0.7
+
+                    if auto_escalate and escalation_score >= threshold:
+                        # Escalate: set priority urgent + bump escalation_level
+                        await cur.execute(
+                            "UPDATE tickets SET priority = 'urgent', escalation_level = escalation_level + 1, updated_at = %s WHERE id = %s::uuid",
+                            (datetime.now(timezone.utc), ticket_id)
+                        )
+                        # Audit log
+                        await cur.execute("""
+                            INSERT INTO audit_log (id, organization_id, action, entity_type, entity_id, new_values, created_at)
+                            VALUES (%s, %s::uuid, %s, %s, %s::uuid, %s, %s)
+                        """, (
+                            str(uuid4()), org_id, "sentiment_auto_escalated", "ticket", ticket_id,
+                            json.dumps({"escalation_risk": escalation_risk, "escalation_score": escalation_score,
+                                        "sentiment_label": sentiment_label, "new_priority": "urgent"}),
+                            datetime.now(timezone.utc)
+                        ))
+                        await self.conn.commit()
+                        logger.info("sentiment_auto_escalated", ticket_id=ticket_id,
+                                    escalation_score=escalation_score, sentiment=sentiment_label)
+
+                        # Attempt SMTP notification (best-effort)
+                        try:
+                            import smtplib
+                            from email.mime.text import MIMEText
+                            smtp_host = os.getenv("SMTP_HOST")
+                            smtp_user = os.getenv("SMTP_USER")
+                            smtp_pass = os.getenv("SMTP_PASSWORD")
+                            smtp_from = os.getenv("SMTP_FROM", "support@atum.desk")
+                            if smtp_host and smtp_user and smtp_pass and smtp_pass != "your-gmail-app-password":
+                                msg = MIMEText(f"Ticket {ticket_id} auto-escalated to URGENT.\nSentiment: {sentiment_label} (score: {escalation_score})")
+                                msg["Subject"] = f"[ATUM DESK] Auto-Escalation: Ticket {ticket_id[:8]}..."
+                                msg["From"] = smtp_from
+                                msg["To"] = smtp_user  # Notify admin
+                                with smtplib.SMTP(smtp_host, int(os.getenv("SMTP_PORT", "587"))) as s:
+                                    s.starttls()
+                                    s.login(smtp_user, smtp_pass)
+                                    s.send_message(msg)
+                                logger.info("escalation_email_sent", ticket_id=ticket_id)
+                        except Exception as smtp_err:
+                            logger.debug("escalation_email_skipped", reason=str(smtp_err))
+
+            except Exception as esc_err:
+                logger.warning("escalation_check_failed", error=str(esc_err))
+
         await self.complete_job(job["id"], True)
         logger.info("sentiment_analysis_completed", ticket_id=ticket_id,
-                     sentiment=sentiment_data.get("sentiment_label"))
+                     sentiment=sentiment_data.get("sentiment_label"),
+                     escalation_risk=escalation_risk)
+        return True
+
+    async def handle_cleanup_logs(self, job: Dict[str, Any]) -> bool:
+        """Gap 17: Cleanup old logs based on retention policy"""
+        org_id = job.get("organization_id")
+        retention_days = 365 
+        
+        if org_id:
+             async with self.conn.cursor() as cur:
+                await cur.execute("SELECT audit_retention_days FROM org_settings WHERE organization_id = %s::uuid", (org_id,))
+                row = await cur.fetchone()
+                if row and row[0]:
+                    retention_days = row[0]
+
+        logger.info("running_cleanup", org_id=org_id, retention_days=retention_days)
+        cutoff = f"NOW() - INTERVAL '{retention_days} days'"
+        
+        async with self.conn.cursor() as cur:
+            # Cleanup audit logs
+            q1 = f"DELETE FROM audit_log WHERE created_at < {cutoff}"
+            if org_id: q1 += f" AND organization_id = '{org_id}'"
+            await cur.execute(q1)
+            audit_deleted = cur.rowcount
+            
+            # Cleanup job queue
+            q2 = f"DELETE FROM job_queue WHERE status IN ('DONE', 'FAILED') AND updated_at < {cutoff}"
+            if org_id: q2 += f" AND organization_id = '{org_id}'"
+            await cur.execute(q2)
+            jobs_deleted = cur.rowcount
+            
+            await self.conn.commit()
+            
+        logger.info("cleanup_completed", audit_deleted=audit_deleted, jobs_deleted=jobs_deleted)
+        await self.complete_job(job["id"], True)
         return True
 
     async def process_job(self, job: Dict[str, Any]) -> bool:

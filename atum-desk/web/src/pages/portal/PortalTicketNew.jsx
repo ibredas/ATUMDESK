@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Wordmark } from '../../components/Brand/Wordmark'
+import { AlertTriangle, ArrowLeft } from 'lucide-react'
 
 export default function PortalTicketNew() {
   const navigate = useNavigate()
@@ -33,12 +34,12 @@ export default function PortalTicketNew() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-0)]">
+    <div className="min-h-screen bg-[var(--atum-bg)]">
       <div className="grain-overlay"></div>
-      <nav className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-[var(--glass-border)] backdrop-blur-sm">
+      <nav className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-[var(--atum-border)] backdrop-blur-sm">
         <Wordmark className="h-6 text-[#60a5fa]" suffix="PORTAL" />
-        <Link to="/portal/tickets" className="text-[10px] uppercase tracking-widest text-[var(--text-2)] hover:text-white transition-colors">
-          ← My Tickets
+        <Link to="/portal/tickets" className="text-[10px] uppercase tracking-widest text-[var(--atum-text-muted)] hover:text-white transition-colors flex items-center gap-1">
+          <ArrowLeft size={12} /> My Tickets
         </Link>
       </nav>
 
@@ -47,8 +48,8 @@ export default function PortalTicketNew() {
 
         <form onSubmit={handleSubmit} className="glass-panel rounded-xl p-8 space-y-6">
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center font-medium">
-              ⚠️ {error}
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center font-medium flex items-center justify-center gap-1">
+              <AlertTriangle size={14} /> {error}
             </div>
           )}
           <div>
@@ -64,7 +65,7 @@ export default function PortalTicketNew() {
             <div className="flex gap-2">
               {['low', 'medium', 'high', 'urgent'].map(p => (
                 <button key={p} type="button" onClick={() => setPriority(p)}
-                  className={`text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-full transition-all border ${priority === p ? `badge-${p} border-current` : 'border-[var(--glass-border)] text-[var(--text-2)] hover:bg-white/5'
+                  className={`text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-full transition-all border ${priority === p ? `badge-${p} border-current` : 'border-[var(--atum-border)] text-[var(--atum-text-muted)] hover:bg-white/5'
                     }`}>
                   {p}
                 </button>

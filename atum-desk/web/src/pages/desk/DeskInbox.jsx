@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Wordmark } from '../../components/Brand/Wordmark'
-import DeskSidebar from '../../components/DeskSidebar'
+import { PageShell, GlassCard } from '../../components/Premium'
+import { Inbox, CheckCircle, AlertCircle, Clock, Filter, Search, User } from 'lucide-react'
+import DensityToggle from '../../components/DensityToggle'
 
 export default function DeskInbox() {
   const navigate = useNavigate()
@@ -9,6 +10,7 @@ export default function DeskInbox() {
   const [tickets, setTickets] = useState([])
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
+  const [density, setDensity] = useState('default')
 
   useEffect(() => {
     if (!token) { navigate('/desk/login'); return }
@@ -37,79 +39,102 @@ export default function DeskInbox() {
     )
 
   const filters = [
-    { key: 'all', label: 'All' },
-    { key: 'open', label: 'Open' },
-    { key: 'resolved', label: 'Resolved' },
-    { key: 'closed', label: 'Closed' },
+    { key: 'all', label: 'All Tickets', icon: Inbox },
+    { key: 'open', label: 'Open', icon: Clock },
+    { key: 'resolved', label: 'Resolved', icon: CheckCircle },
+    { key: 'urgent', label: 'Urgent', icon: AlertCircle },
   ]
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-0)]">
-      <DeskSidebar />
-      {/* Main */}
-      <div className="flex-1 p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-2xl font-bold">Inbox</h1>
-            <div className="flex items-center gap-2">
-              {filters.map(f => (
-                <button
-                  key={f.key}
-                  onClick={() => setFilter(f.key)}
-                  className={`text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full transition-all ${filter === f.key
-                    ? 'bg-[var(--accent-gold)] text-black'
-                    : 'text-[var(--text-2)] hover:text-white hover:bg-white/5 border border-[var(--glass-border)]'
-                    }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
+    <PageShell
+      title="Inbox"
+      subtitle="Manage and respond to customer tickets"
+      actions={
+        <div className="flex gap-2">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--atum-text-muted)]" />
+            <input
+              type="text"
+              placeholder="Search tickets..."
+              className="pl-9 pr-4 py-2 bg-[var(--atum-surface)] border border-[var(--atum-border)] rounded-full text-sm focus:outline-none focus:border-[var(--atum-accent-gold)] w-64 transition-colors"
+            />
           </div>
-
-          <div className="glass-panel rounded-xl p-6">
-            {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="spinner"></div>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="text-center py-16 text-[var(--text-2)]">
-                <div className="text-4xl mb-3">📭</div>
-                <p className="text-sm">No tickets found</p>
-              </div>
-            ) : (
-              <table className="atum-table">
-                <thead>
-                  <tr>
-                    <th>Subject</th>
-                    <th>Requester</th>
-                    <th>Status</th>
-                    <th>Priority</th>
-                    <th>Assigned</th>
-                    <th>Updated</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map(ticket => (
-                    <tr key={ticket.id} onClick={() => navigate(`/desk/tickets/${ticket.id}`)}>
-                      <td className="font-medium text-white max-w-[300px] truncate">{ticket.subject}</td>
-                      <td className="text-xs">{ticket.requester_email || '—'}</td>
-                      <td><span className={`badge badge-${ticket.status}`}>{ticket.status.replace('_', ' ')}</span></td>
-                      <td><span className={`badge badge-${ticket.priority}`}>{ticket.priority}</span></td>
-                      <td className="text-xs">{ticket.assigned_to || '—'}</td>
-                      <td className="text-xs">{new Date(ticket.updated_at).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          <div className="mt-4 text-[10px] text-[var(--text-2)] uppercase tracking-widest">
-            {filtered.length} ticket{filtered.length !== 1 ? 's' : ''}
-          </div>
+          <button className="btn-gold flex items-center gap-2">
+            <Filter size={16} /> <span>Filter</span>
+          </button>
+          <DensityToggle value={density} onChange={setDensity} />
         </div>
+      }
+    >
+      {/* Filters (Tabs Style) */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+        {filters.map(f => (
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${filter === f.key
+              ? 'bg-[var(--atum-accent-gold)] text-black border-[var(--atum-accent-gold)] shadow-[0_0_15px_rgba(217,181,90,0.3)]'
+              : 'bg-[var(--atum-surface)] border-[var(--atum-border)] text-[var(--atum-text-muted)] hover:text-white hover:border-[var(--atum-border-strong)]'
+              }`}
+          >
+            <f.icon size={14} /> {f.label}
+          </button>
+        ))}
       </div>
-    </div>
+
+      <GlassCard className="p-0 overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <div className="w-8 h-8 border-2 border-[var(--atum-accent-gold)] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-24 text-[var(--atum-text-muted)]">
+            <Inbox size={48} className="mx-auto mb-4 opacity-20" />
+            <p className="text-sm">No tickets found matching this filter</p>
+          </div>
+        ) : (
+          <table className={`w-full text-left border-collapse ${density === 'compact' ? 'density-compact' : ''}`}>
+            <thead>
+              <tr className="border-b border-[var(--atum-border)] text-xs uppercase tracking-wider text-[var(--atum-text-muted)]">
+                <th className="p-4 font-semibold">Subject</th>
+                <th className="p-4 font-semibold">Requester</th>
+                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Priority</th>
+                <th className="p-4 font-semibold">Assignee</th>
+                <th className="p-4 font-semibold">Updated</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--atum-border)]">
+              {filtered.map(ticket => (
+                <tr
+                  key={ticket.id}
+                  onClick={() => navigate(`/desk/tickets/${ticket.id}`)}
+                  className="group hover:bg-[var(--atum-glass-hover)] transition-colors cursor-pointer"
+                >
+                  <td className="p-4">
+                    <div className="font-medium text-white group-hover:text-[var(--atum-accent-gold)] transition-colors line-clamp-1">
+                      {ticket.subject}
+                    </div>
+                    <div className="text-xs text-[var(--atum-text-muted)] mt-0.5">#{ticket.id.slice(0, 8)}</div>
+                  </td>
+                  <td className="p-4 text-sm text-[var(--atum-text-1)]">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-[var(--atum-surface-2)] flex items-center justify-center text-[10px]">
+                        {ticket.requester_email?.[0].toUpperCase()}
+                      </div>
+                      {ticket.requester_email}
+                    </div>
+                  </td>
+                  <td className="p-4"><span className={`badge badge-${ticket.status}`}>{ticket.status?.replace('_', ' ')}</span></td>
+                  <td className="p-4"><span className={`badge badge-${ticket.priority}`}>{ticket.priority}</span></td>
+                  <td className="p-4 text-sm text-[var(--atum-text-muted)]">{ticket.assigned_to || '—'}</td>
+                  <td className="p-4 text-xs text-[var(--atum-text-muted)] font-mono">{new Date(ticket.updated_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </GlassCard>
+    </PageShell>
   )
 }

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
+import { PageShell, GlassCard } from '../../components/Premium'
+import { BookMarked, Plus, AlertOctagon, KeyRound, Server, ShieldAlert, Eye } from 'lucide-react'
 
 export default function DeskPlaybooks() {
     const [playbooks, setPlaybooks] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    useEffect(() => {
-        loadPlaybooks()
-    }, [])
+    useEffect(() => { loadPlaybooks() }, [])
 
     const loadPlaybooks = async () => {
         try {
@@ -27,80 +27,56 @@ export default function DeskPlaybooks() {
     }
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Playbooks / Runbooks</h1>
-                <button className="px-4 py-2 bg-[var(--accent-gold)] text-black rounded-lg font-medium">
-                    + Create Playbook
-                </button>
-            </div>
+        <PageShell title="Playbooks / Runbooks" icon={BookMarked}
+            actions={<button className="btn-gold flex items-center gap-2"><Plus size={16} /> Create Playbook</button>}>
 
             {loading ? (
-                <div className="text-[var(--text-muted)]">Loading playbooks...</div>
+                <div className="text-[var(--atum-text-muted)]">Loading playbooks...</div>
             ) : error ? (
                 <div className="text-red-400">{error}</div>
             ) : playbooks.length === 0 ? (
-                <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-8 text-center">
-                    <div className="text-4xl mb-4">📋</div>
+                <GlassCard className="text-center py-8">
+                    <BookMarked size={48} className="mx-auto mb-4 text-[var(--atum-text-muted)]" />
                     <h3 className="text-lg font-medium mb-2">No Playbooks Yet</h3>
-                    <p className="text-[var(--text-muted)] mb-4">
-                        Create incident response playbooks to guide your team through common scenarios.
-                    </p>
-                    <button className="px-4 py-2 bg-[var(--accent-gold)] text-black rounded-lg font-medium">
-                        Create Your First Playbook
-                    </button>
-                </div>
+                    <p className="text-[var(--atum-text-muted)] mb-4">Create incident response playbooks to guide your team through common scenarios.</p>
+                    <button className="btn-gold">Create Your First Playbook</button>
+                </GlassCard>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {playbooks.map((playbook) => (
-                        <div key={playbook.id} className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+                        <GlassCard key={playbook.id}>
                             <h3 className="font-semibold mb-2">{playbook.name}</h3>
-                            <p className="text-sm text-[var(--text-muted)] mb-4">
-                                {playbook.description || 'No description'}
-                            </p>
+                            <p className="text-sm text-[var(--atum-text-muted)] mb-4">{playbook.description || 'No description'}</p>
                             <div className="flex items-center justify-between text-sm">
-                                <span className="text-[var(--text-muted)]">
-                                    {playbook.steps?.length || 0} steps
-                                </span>
-                                <button className="text-[var(--accent-gold)] hover:underline">
-                                    View
-                                </button>
+                                <span className="text-[var(--atum-text-muted)]">{playbook.steps?.length || 0} steps</span>
+                                <button className="text-[var(--atum-accent-gold)] hover:underline flex items-center gap-1"><Eye size={14} /> View</button>
                             </div>
-                        </div>
+                        </GlassCard>
                     ))}
                 </div>
             )}
 
-            {/* Pre-built Templates */}
             <div className="mt-8">
                 <h2 className="text-lg font-semibold mb-4">Quick Start Templates</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
-                        <h3 className="font-medium mb-2">🔴 Incident Response</h3>
-                        <p className="text-sm text-[var(--text-muted)]">
-                            Standard incident response workflow with escalation steps
-                        </p>
-                    </div>
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
-                        <h3 className="font-medium mb-2">🆘 Password Reset</h3>
-                        <p className="text-sm text-[var(--text-muted)]">
-                            Guided password reset verification process
-                        </p>
-                    </div>
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
-                        <h3 className="font-medium mb-2">💻 Server Outage</h3>
-                        <p className="text-sm text-[var(--text-muted)]">
-                            Server outage troubleshooting and communication steps
-                        </p>
-                    </div>
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
-                        <h3 className="font-medium mb-2">🔐 Security Breach</h3>
-                        <p className="text-sm text-[var(--text-muted)]">
-                            Security incident containment and reporting steps
-                        </p>
-                    </div>
+                    <GlassCard>
+                        <h3 className="font-medium mb-2 flex items-center gap-2"><AlertOctagon size={16} className="text-red-400" /> Incident Response</h3>
+                        <p className="text-sm text-[var(--atum-text-muted)]">Standard incident response workflow with escalation steps</p>
+                    </GlassCard>
+                    <GlassCard>
+                        <h3 className="font-medium mb-2 flex items-center gap-2"><KeyRound size={16} className="text-blue-400" /> Password Reset</h3>
+                        <p className="text-sm text-[var(--atum-text-muted)]">Guided password reset verification process</p>
+                    </GlassCard>
+                    <GlassCard>
+                        <h3 className="font-medium mb-2 flex items-center gap-2"><Server size={16} className="text-orange-400" /> Server Outage</h3>
+                        <p className="text-sm text-[var(--atum-text-muted)]">Server outage troubleshooting and communication steps</p>
+                    </GlassCard>
+                    <GlassCard>
+                        <h3 className="font-medium mb-2 flex items-center gap-2"><ShieldAlert size={16} className="text-purple-400" /> Security Breach</h3>
+                        <p className="text-sm text-[var(--atum-text-muted)]">Security incident containment and reporting steps</p>
+                    </GlassCard>
                 </div>
             </div>
-        </div>
+        </PageShell>
     )
 }

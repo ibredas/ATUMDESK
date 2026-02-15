@@ -12,9 +12,9 @@ export function Card({
   ...props 
 }) {
   const variants = {
-    default: 'bg-[var(--card)] border border-[var(--border)] rounded-xl',
+    default: 'bg-[var(--atum-surface)] border border-[var(--atum-border)] rounded-xl',
     glass: 'glass-panel rounded-xl',
-    elevated: 'bg-[var(--bg-1)] border border-[var(--border)] rounded-xl shadow-xl',
+    elevated: 'bg-[var(--bg-1)] border border-[var(--atum-border)] rounded-xl shadow-xl',
   }
   
   const paddings = {
@@ -37,7 +37,7 @@ export function Card({
 
 export function CardHeader({ children, className = '' }) {
   return (
-    <div className={`mb-4 pb-3 border-b border-[var(--border)] ${className}`}>
+    <div className={`mb-4 pb-3 border-b border-[var(--atum-border)] ${className}`}>
       {children}
     </div>
   )
@@ -45,7 +45,7 @@ export function CardHeader({ children, className = '' }) {
 
 export function CardTitle({ children, className = '' }) {
   return (
-    <h3 className={`text-sm font-bold uppercase tracking-widest text-[var(--text-2)] ${className}`}>
+    <h3 className={`text-sm font-bold uppercase tracking-widest text-[var(--atum-text-muted)] ${className}`}>
       {children}
     </h3>
   )
