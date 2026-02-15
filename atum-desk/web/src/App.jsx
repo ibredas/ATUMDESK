@@ -31,6 +31,9 @@ import AdminSecurity from './pages/admin/AdminSecurity'
 import AdminDashboard from './pages/desk/AdminDashboard'
 import AdminJobQueue from './pages/desk/admin/AdminJobQueue'
 import AdminIPRestrictions from './pages/desk/admin/AdminIPRestrictions'
+import AdminAIControl from './pages/desk/admin/AdminAIControl'
+import AdminFormsStudio from './pages/desk/admin/AdminFormsStudio'
+import AdminOrgManagement from './pages/desk/admin/AdminOrgManagement'
 
 // AI Pages
 import AIAnalyticsHub from './pages/desk/ai/AIAnalyticsHub'
@@ -95,12 +98,15 @@ function App() {
         <Route path="/desk/incidents" element={<DeskIncidents />} />
         <Route path="/desk/postmortems" element={<DeskPostmortems />} />
         <Route path="/desk/kb-suggestions" element={<DeskKBSuggestions />} />
-        
+
         {/* NEW: Admin */}
         <Route path="/desk/admin/security" element={<AdminSecurity />} />
         <Route path="/desk/admin/jobs" element={<AdminJobQueue />} />
         <Route path="/desk/admin/policies" element={<AdminPolicyCenter />} />
         <Route path="/desk/admin/ip-restrictions" element={<AdminIPRestrictions />} />
+        <Route path="/desk/admin/ai-control" element={<AdminAIControl />} />
+        <Route path="/desk/admin/forms" element={<AdminFormsStudio />} />
+        <Route path="/desk/admin/org" element={<AdminOrgManagement />} />
         <Route path="/desk/admin" element={<AdminDashboard />} />
 
         {/* AI Intelligence */}

@@ -40,7 +40,9 @@ structlog.configure(
 logger = structlog.get_logger("job_worker")
 
 # Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://atum:atum@localhost:5432/atum_desk")
+_raw_db_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/atum_desk")
+# Normalize SQLAlchemy-style URLs (e.g. postgresql+asyncpg://) to raw psycopg format
+DATABASE_URL = _raw_db_url.replace("postgresql+asyncpg://", "postgresql://").replace("postgresql+psycopg://", "postgresql://")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "ATUM-DESK-COPILOT:latest")
 
@@ -51,6 +53,7 @@ JOB_TYPES = {
     "SMART_REPLY": "handle_smart_reply",
     "SLA_PREDICT": "handle_sla_predict",
     "METRICS_SNAPSHOT": "handle_metrics_snapshot",
+    "SENTIMENT_ANALYSIS": "handle_sentiment_analysis",
 }
 
 # Retry configuration
@@ -580,6 +583,116 @@ Respond with ONLY valid JSON (no markdown):
         logger.info("metrics_snapshot_completed", org_id=org_id)
         return True
     
+    async def handle_sentiment_analysis(self, job: Dict[str, Any]) -> bool:
+        """Sentiment analysis job handler — detect escalation risk"""
+        payload = job.get("payload", {})
+        ticket_id = payload.get("ticket_id")
+        org_id = job.get("organization_id")
+
+        if not ticket_id:
+            await self.complete_job(job["id"], False, "Missing ticket_id")
+            return False
+
+        logger.info("processing_sentiment_job", ticket_id=ticket_id, org_id=org_id)
+
+        # Get ticket details
+        query = "SELECT subject, description FROM tickets WHERE id = %s::uuid"
+
+        async with self.conn.cursor() as cur:
+            await cur.execute(query, (ticket_id,))
+            row = await cur.fetchone()
+
+            if not row:
+                await self.complete_job(job["id"], False, "Ticket not found")
+                return False
+
+            subject, description = row[0], row[1]
+
+        # Call Ollama for sentiment analysis
+        prompt = f"""Analyze the sentiment and escalation risk of this support ticket.
+
+Subject: {subject}
+Description: {description}
+
+Respond with ONLY valid JSON (no markdown):
+{{
+  "sentiment_label": "positive|neutral|negative|angry",
+  "sentiment_score": 0.0-1.0,
+  "escalation_risk": "low|medium|high",
+  "escalation_score": 0.0-1.0,
+  "key_phrases": ["phrase1", "phrase2"]
+}}
+"""
+
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    f"{OLLAMA_URL}/api/generate",
+                    json={
+                        "model": OLLAMA_MODEL,
+                        "prompt": prompt,
+                        "stream": False,
+                        "options": {"num_predict": 200}
+                    }
+                )
+
+                if response.status_code == 200:
+                    result = response.json()
+                    response_text = result.get("response", "")
+
+                    import re
+                    json_match = re.search(r'\{[^}]+\}', response_text, re.DOTALL)
+                    if json_match:
+                        sentiment_data = json.loads(json_match.group())
+                    else:
+                        sentiment_data = {
+                            "sentiment_label": "neutral",
+                            "sentiment_score": 0.5,
+                            "escalation_risk": "low",
+                            "escalation_score": 0.2
+                        }
+                else:
+                    sentiment_data = {
+                        "sentiment_label": "neutral",
+                        "sentiment_score": 0.5,
+                        "escalation_risk": "low",
+                        "escalation_score": 0.2
+                    }
+        except Exception as e:
+            logger.warning("sentiment_analysis_failed", error=str(e))
+            sentiment_data = {
+                "sentiment_label": "neutral",
+                "sentiment_score": 0.5,
+                "escalation_risk": "low",
+                "escalation_score": 0.2
+            }
+
+        # Store as AI suggestion (no new table needed)
+        suggestion_id = str(uuid4())
+        query = """
+            INSERT INTO ai_suggestions (
+                id, organization_id, ticket_id, suggestion_type, content,
+                confidence, model_id, created_at, expires_at
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        async with self.conn.cursor() as cur:
+            await cur.execute(query, (
+                suggestion_id, org_id, ticket_id, "SENTIMENT_ANALYSIS",
+                json.dumps(sentiment_data),
+                sentiment_data.get("sentiment_score", 0.5),
+                OLLAMA_MODEL,
+                datetime.now(timezone.utc),
+                datetime.now(timezone.utc)  # No expiry for sentiment
+            ))
+            await self.conn.commit()
+
+        await self.complete_job(job["id"], True)
+        logger.info("sentiment_analysis_completed", ticket_id=ticket_id,
+                     sentiment=sentiment_data.get("sentiment_label"))
+        return True
+
     async def process_job(self, job: Dict[str, Any]) -> bool:
         """Process a single job"""
         job_type = job.get("job_type")

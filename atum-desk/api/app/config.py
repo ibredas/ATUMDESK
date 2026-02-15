@@ -129,9 +129,6 @@ class Settings(BaseSettings):
     WS_HEARTBEAT_INTERVAL: int = 30  # seconds
     WS_MAX_CONNECTIONS: int = 1000
     
-    # Slack
-    SLACK_WEBHOOK_URL: Optional[str] = None
-    
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"

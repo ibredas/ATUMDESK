@@ -257,6 +257,14 @@ async def create_ticket(
         ticket_id=str(new_ticket.id),
         organization_id=str(new_ticket.organization_id)
     )
+    await job_queue.enqueue_smart_reply(
+        ticket_id=str(new_ticket.id),
+        organization_id=str(new_ticket.organization_id)
+    )
+    await job_queue.enqueue_sla_predict(
+        ticket_id=str(new_ticket.id),
+        organization_id=str(new_ticket.organization_id)
+    )
     
     return TicketResponse(
         id=str(new_ticket.id),

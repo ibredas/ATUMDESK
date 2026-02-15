@@ -26,7 +26,7 @@ export default function DeskSidebar() {
                 <Link to="/desk/problems" className={isActive('/desk/problems')}>🧩 Problems</Link>
                 <Link to="/desk/changes" className={isActive('/desk/changes')}>🚧 Changes</Link>
                 <Link to="/desk/assets" className={isActive('/desk/assets')}>💻 Assets</Link>
-                
+
                 {/* NEW: Operations Section */}
                 <div className="mt-4 pt-4 border-t border-[var(--border)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider px-2">Operations</span>
@@ -34,7 +34,7 @@ export default function DeskSidebar() {
                 <Link to="/desk/workflows" className={isActive('/desk/workflows')}>⚡ Workflows</Link>
                 <Link to="/desk/playbooks" className={isActive('/desk/playbooks')}>📋 Playbooks</Link>
                 <Link to="/desk/sla-alerts" className={isActive('/desk/sla-alerts')}>⏰ SLA Alerts</Link>
-                
+
                 {/* AI Section */}
                 <div className="mt-4 pt-4 border-t border-[var(--border)]">
                     <span className="text-xs text-[var(--accent-gold)] uppercase tracking-wider px-2">◆ AI Intelligence</span>
@@ -43,7 +43,7 @@ export default function DeskSidebar() {
                 <Link to="/desk/ai/insights" className={isActive('/desk/ai/insights')}>💡 Smart Insights</Link>
                 <Link to="/desk/ai/agent-assist" className={isActive('/desk/ai/agent-assist')}>🎯 Agent Assist</Link>
                 <Link to="/desk/ai/sla-prediction" className={isActive('/desk/ai/sla-prediction')}>🔮 SLA Predict</Link>
-                
+
                 {/* NEW: Governance Section */}
                 <div className="mt-4 pt-4 border-t border-[var(--border)]">
                     <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider px-2">Governance</span>
@@ -53,7 +53,7 @@ export default function DeskSidebar() {
                 <Link to="/desk/incidents" className={isActive('/desk/incidents')}>🚨 Incidents</Link>
                 <Link to="/desk/postmortems" className={isActive('/desk/postmortems')}>📋 Postmortems</Link>
                 <Link to="/desk/kb-suggestions" className={isActive('/desk/kb-suggestions')}>💡 KB Deflection</Link>
-                
+
                 {/* NEW: Admin Section */}
                 <div className="mt-4 pt-4 border-t border-[var(--border)]">
                     <span className="text-xs text-[var(--accent-gold)] uppercase tracking-wider px-2">◆ Admin</span>
@@ -62,7 +62,9 @@ export default function DeskSidebar() {
                 <Link to="/desk/admin/jobs" className={isActive('/desk/admin/jobs')}>📋 Job Queue</Link>
                 <Link to="/desk/admin/policies" className={isActive('/desk/admin/policies')}>🛡️ Policy Center</Link>
                 <Link to="/desk/admin/ip-restrictions" className={isActive('/desk/admin/ip-restrictions')}>🔐 IP Restrictions</Link>
-                <Link to="/desk/admin/services" className={isActive('/desk/admin/services')}>🛠 Service Catalog</Link>
+                <Link to="/desk/admin/ai-control" className={isActive('/desk/admin/ai-control')}>🤖 AI & RAG</Link>
+                <Link to="/desk/admin/forms" className={isActive('/desk/admin/forms')}>📝 Forms Studio</Link>
+                <Link to="/desk/admin/org" className={isActive('/desk/admin/org')}>👥 Organization</Link>
                 <Link to="/desk/admin/security" className={isActive('/desk/admin/security')}>🔒 Security</Link>
 
                 <div className="mt-auto pt-8">
